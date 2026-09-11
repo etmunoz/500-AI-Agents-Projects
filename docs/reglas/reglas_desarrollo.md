@@ -34,7 +34,7 @@ Sin esto, dos documentos que se contradicen se resuelven por quien lo leyó últ
 - **Propósito**: un catálogo navegable de proyectos de agentes de IA (~118 entradas por framework y por industria) más 21 agentes ejecutables que sirven de ejemplo de referencia. Quien llega quiere una de dos cosas: encontrar un proyecto parecido al que tiene en mente, o clonar algo que corra hoy y modificarlo.
 - **Operación**: local para los agentes (cada uno se ejecuta en la máquina de quien lo clona); GitHub Pages para el catálogo web. Sin servidor propio, sin usuarios, sin autenticación.
 - **Idioma del código**: **inglés** para variables, comentarios, docstrings, nombres de carpeta y mensajes de commit. La documentación de proceso interno —este archivo, `docs/adopcion_ingenieria.md`, `AGENTS.md`— está en español. El catálogo y los README de agentes, en inglés: su audiencia es la comunidad.
-- **Entorno**: Python ≥3.9 con `pip` y `venv` (uno por agente); Node ≥18 con `npm` para `web/`.
+- **Entorno**: Python ≥3.9, un entorno por agente con `pip` y `requirements.txt` — el intérprete se obtiene con **`uv`** (§2.3). Node ≥18 con `npm` para `web/`.
 - **Interfaz**: CLI por agente (`python agent.py`) + una SPA estática de catálogo.
 - **Origen**: fork de `ashishpatel26/500-AI-Agents-Projects`. **Decisión del PM del 2026-09-11: este fork diverge.** No se agregan referencias nuevas al upstream; las **13 que quedan, repartidas en 6 archivos**, se reescriben en los pasos 5 y 8 de la adopción. Inventario línea por línea en [`docs/adopcion_ingenieria.md`](../adopcion_ingenieria.md).
 
@@ -61,7 +61,8 @@ Sin esto, dos documentos que se contradicen se resuelven por quien lo leyó últ
 
 | Componente | Tecnología |
 |---|---|
-| Agentes | Python ≥3.9, un `venv` y un `requirements.txt` por agente |
+| Agentes | Python ≥3.9, un entorno y un `requirements.txt` por agente |
+| Intérprete de Python | **`uv`** es la forma declarada de obtenerlo y de fijarlo. Ver §2.3 |
 | Frameworks de agente | LangChain (12 agentes), CrewAI (4), LangGraph (3), LlamaIndex (1), sin framework (1) |
 | Modelos | OpenAI `gpt-4o-mini` (14 agentes) y `gpt-4o` (6); un agente no usa modelo |
 | Configuración | `python-dotenv` — los 21 agentes llaman a `load_dotenv()` |
@@ -89,6 +90,28 @@ Sin esto, dos documentos que se contradicen se resuelven por quien lo leyó últ
 | Análisis de seguridad | **no hay** en CI; `gitleaks` corre en el `pre-commit` local | — |
 
 **El estilo de Python se valida por revisión manual. Es un hueco declarado, no un olvido.** Ningún workflow ejecuta Python: el CI valida markdown, enlaces y sign-off, y nada más. Ver §6.
+
+### 2.3. El intérprete de Python se obtiene con `uv`
+
+Decisión del PM, 2026-09-11. `uv` instala y administra los intérpretes; **no reemplaza** a `pip` ni a `requirements.txt` dentro de cada agente, que siguen siendo el contrato público de §2.1.
+
+```bash
+uv python install                    # instala un intérprete administrado por uv
+uv python list                       # muestra los que hay y dónde están
+```
+
+**Y después hay que declararlo, una vez por clon**, o las herramientas del repositorio no lo encuentran:
+
+```bash
+git config --local ingenieria.python "<ruta que devolvió uv python list>"
+```
+
+Va en `--local` porque la ruta es de tu máquina: vive en `.git/config`, que no se versiona.
+
+**Por qué hace falta declararlo y no alcanza con el PATH.** En Windows, `python` y `python3` están en el PATH como alias de la Microsoft Store que **fallan al ejecutarse**. Están antes que cualquier otra cosa, así que un intérprete instalado después no gana. Verificado el 2026-09-11 con uv ya instalado: `command -v python3` lo sigue encontrando y `python3 -c ""` sigue fallando. Ver §11.2.
+
+**Los agentes conservan `pip` y `venv` en su documentación pública.** Los 21 README y `CONTRIBUTION.md` documentan `pip install -r requirements.txt`, y eso **no cambia**: quien clona un agente no tiene por qué tener `uv`. La decisión de arriba gobierna las herramientas *de este repositorio* —los hooks, la comprobación de sintaxis, los scripts de auditoría—, no el contrato con quien usa un agente.
+
 
 ---
 
@@ -361,7 +384,7 @@ Cuando algo hace perder tiempo, **no basta con arreglarlo**. Antes de cerrar el 
 | **`.gitignore` inexistente, y `SECURITY.md` afirmando lo contrario** | Ninguno: todo se ve bien hasta que una clave está en el historial | `SECURITY.md:36` decía que los `.env` estaban ignorados "by default". No había `.gitignore` en ningún nivel. La documentación no omitía la protección: **aseguraba que existía**, así que nadie la revisaba | [`.gitignore`](../../.gitignore) + hook `pre-commit` con `gitleaks`. Probado intentando commitear una clave inventada: frenó con `leaks found: 2` |
 | **Hooks sin bit de ejecución** | En Windows funciona perfecto. En Linux y macOS git **omite el hook en silencio** y el repositorio queda sin protección de secretos | `core.filemode=false` en Git para Windows: el `chmod +x` no se registra en el índice. Se commiteó `100644` | Los modos se fijaron a `100755` con `git update-index --chmod=+x` y se verificaron **en un clon limpio**, no leyendo el índice local |
 | **CRLF en scripts POSIX** | `bad interpreter` en Linux y macOS; en Windows no pasa nada | `core.autocrlf=true` a nivel **sistema** en Git para Windows. Sin `.gitattributes`, cada clon decide solo. MSYS tolera el `\r`, que es peor: en Windows parece que funciona | [`.gitattributes`](../../.gitattributes) con `eol=lf` explícito en `.githooks/*` y `*.sh` |
-| **`command -v python` encuentra un Python que no existe** | La comprobación de secretos informaba "no corrió" en vez de fallar, o peor, un chequeo salía verde sin haber corrido | En Windows, `python` y `python3` están en el PATH como **alias de la Microsoft Store** que fallan al ejecutarse. `command -v` los encuentra y los da por buenos | El intérprete se **prueba** con `-c ""`, no se pregunta si está. Y toda comprobación que no puede correr sale con **2 = NO SÉ**, nunca con 0 |
+| **`command -v python` encuentra un Python que no existe** | La comprobación de secretos informaba "no corrió" en vez de fallar, o peor, un chequeo salía verde sin haber corrido | En Windows, `python` y `python3` están en el PATH como **alias de la Microsoft Store** que fallan al ejecutarse. `command -v` los encuentra y los da por buenos. **Instalar Python no lo arregla:** los alias siguen antes en el PATH. Verificado el 2026-09-11 con `uv` ya instalado y 3.13.13 funcionando — `command -v python3` seguía encontrando el alias y `python3 -c ""` seguía fallando | El intérprete se **prueba** con `-c ""`, no se pregunta si está; y se **declara por ruta** con `git config --local ingenieria.python` en vez de confiar en el PATH (§2.3). Toda comprobación que no puede correr sale con **2 = NO SÉ**, nunca con 0 |
 | **El README manda a clonar otro repositorio** | Quien sigue el Quick Start al pie de la letra termina en el fork de otra persona; quien reporta una vulnerabilidad —o una conducta— la manda al correo de otra persona | Fork de `ashishpatel26` con **13 referencias al original intactas en 6 archivos** | 🚧 Todavía ninguno. Se reescriben en los pasos 5 y 8. Hasta entonces, la regla de §1 |
 | **Contar con un `grep` demasiado estrecho** | El informe del paso 0 afirmó "nueve referencias al upstream en cuatro archivos". El número real es **13 en 6** | El `grep` sólo miraba `*.md` y sólo el patrón `ashishpatel26`. Se le escaparon el correo del mantenedor original (`ashishpatel.ce.2011@`) en dos archivos, y una regla en un `.yml`. **Una cifra medida con el filtro equivocado se ve exactamente igual que una bien medida** | Todo inventario que vaya a un documento se escribe con el comando que lo produjo al lado, y el comando cubre **todas** las extensiones y **todos** los patrones del concepto, no el más obvio. Ver §7 |
 
@@ -372,8 +395,14 @@ Cuando algo hace perder tiempo, **no basta con arreglarlo**. Antes de cerrar el 
 **Shell de referencia: `bash`** (Git Bash en Windows). Es lo que usan el `README.md`, los hooks —que son POSIX `sh`— y los runners de CI, que corren en `ubuntu-latest`. No se mantienen equivalencias en PowerShell: un comando que sólo funciona en el shell de quien lo escribió es una trampa para el siguiente.
 
 ```bash
-# Activar los hooks — hace falta UNA VEZ POR CLON, no se versiona
-git config core.hooksPath .githooks
+# ── Preparar el clon: DOS cosas, ninguna se versiona ──────────────────
+git config core.hooksPath .githooks                  # 1. activar los hooks
+uv python install                                    # 2. obtener el intérprete
+uv python list                                       #    ver dónde quedó
+git config --local ingenieria.python "<esa ruta>"    #    y declararlo
+
+# Comprobar que el intérprete declarado REALMENTE ejecuta
+"$(git config --get ingenieria.python)" -c "" && echo ok
 
 # Correr un agente
 cd agents/01-web-research-agent
@@ -381,6 +410,9 @@ python -m venv .venv && source .venv/Scripts/activate   # .venv/bin/activate en 
 pip install -r requirements.txt
 cp .env.example .env        # y poner la clave
 python agent.py
+
+# Sintaxis de los 25 archivos Python, sin instalar dependencias
+"$(git config --get ingenieria.python)" -m compileall -q agents crewai_mcp_course
 
 # Catálogo web en desarrollo
 npm --prefix web install

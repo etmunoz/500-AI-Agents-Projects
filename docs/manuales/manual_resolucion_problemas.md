@@ -154,25 +154,31 @@ Para los próximos, `git commit -s` la agrega sola.
 
 **Causa:** Windows instala alias de la Microsoft Store en `WindowsApps` que **están en el PATH y fallan al ejecutarse**. Toda herramienta que pregunte "¿está instalado?" con `command -v` los da por buenos.
 
-**Qué hacer:** instalá Python de verdad. Para comprobar si un intérprete sirve, **probalo**, no preguntes si está:
+**Qué hacer:** obtené un intérprete con `uv`, que es la vía declarada de este proyecto (reglas §2.3), y **declaralo por ruta**:
 
 ```bash
-python -c ""     # silencio y código 0 = funciona
+uv python install
+uv python list                                       # copiá la ruta que muestra
+git config --local ingenieria.python "<esa ruta>"
 ```
 
-Si no queda en el PATH, declaralo para los hooks de este clon:
+**Instalar Python NO alcanza por sí solo**, y es lo que más confunde: los alias de la Store siguen estando **antes** en el PATH, así que `python3` sigue fallando aunque tengas un 3.13 perfectamente instalado. Verificado el 2026-09-11: con `uv` instalado y Python 3.13.13 ejecutando, `command -v python3` seguía encontrando el alias y `python3 -c ""` seguía fallando. Por eso la ruta se declara, no se busca.
+
+Para comprobar si un intérprete sirve, **probalo**, no preguntes si está:
 
 ```bash
-git config --local ingenieria.python "/c/ruta/al/python.exe"
+"$(git config --get ingenieria.python)" -c "" && echo ok
 ```
 
 ### El pre-push dice `NO SÉ` en "agentes (sintaxis)"
 
 **Síntoma:** la comprobación no sale verde ni roja.
 
-**Causa:** no hay Python utilizable. La comprobación sale con código **2**, que significa *no pude medir*.
+**Causa:** no hay Python utilizable, o lo hay pero no está declarado. La comprobación sale con código **2**, que significa *no pude medir*.
 
-**Qué hacer:** instalá Python. **No es un fallo y no frena el push** — pero tampoco es un verde, y el hook lo dice en pantalla precisamente para que no se lea como uno.
+**Qué hacer:** seguí los pasos de la entrada anterior (`uv python install` + `git config --local ingenieria.python`). **No es un fallo y no frena el push** — pero tampoco es un verde, y el hook lo dice en pantalla precisamente para que no se lea como uno.
+
+Verificado el 2026-09-11: al declarar el intérprete, la comprobación pasó de `2` a `0` y compiló los 25 archivos. La prueba de control —meterle un archivo con un error de sintaxis a propósito— devolvió `1`, así que el verde no es un verde vacío.
 
 ---
 

@@ -85,7 +85,7 @@ Es lo único que el repositorio despliega, y no aparece en el README, ni en la g
 8. `link-checker.yml` solo revisa `README.md`. Los 22 README de `agents/` quedan fuera del chequeo de enlaces.
 9. El agente 21 envía texto con PII a `https://api.trustboost.dev`, un tercero. Es su propósito declarado y está bien que exista, pero no figura en ningún modelo de amenaza porque no hay ninguno. Entra en el paso 8.
 10. Sin hoja de ruta. No hay documento ni planes cerrados de los que extraerla; habrá que preguntársela al PM.
-11. **Python no está instalado en esta máquina** (solo el alias del Microsoft Store). Hoy no se puede ejecutar ni verificar localmente nada de `agents/`. Es del entorno, no del repositorio, pero bloquea la verificación desde el paso 7.
+11. ~~**Python no está instalado en esta máquina**~~ — **Resuelto el 2026-09-11 con `uv`.** Ver la sección *Entorno de Python* más abajo. Lo que el hallazgo no anticipaba: instalar Python **no alcanzó**, porque los alias de la Store siguen antes en el PATH. Hubo que declarar la ruta del intérprete.
 
 ---
 
@@ -333,6 +333,50 @@ Como estos README **son** el manual de usuario, la brecha no era un manual falta
 ### Lo que no se pudo medir
 
 `auditoria_manuales.py` —la herramienta que contesta *"de N manuales, cuántos cumplen X"* contra una línea base— **no se pudo correr: esta máquina no tiene Python**. Las cifras de este paso (12 formas, 20 de 21, 4/2/2) salen de `grep` y lectura directa, y se declaran así en vez de presentarse como salida de la herramienta. Revisar N manuales sin rubro fijo son N impresiones; estas tres cifras son mediciones, pero con un instrumento más pobre.
+
+---
+
+## Entorno de Python — resuelto con `uv` · 2026-09-11
+
+Decisión del PM: **`uv` es la vía declarada** para obtener el intérprete. Queda escrito en §2.3 de las reglas.
+
+```
+uv 0.11.9 · cpython 3.13.13 · ruta declarada con git config --local ingenieria.python
+```
+
+**Instalar Python no alcanzó, y esa es la parte que vale registrar.** Con `uv` instalado y 3.13.13 ejecutando correctamente, `command -v python3` **seguía encontrando el alias de la Microsoft Store** y `python3 -c ""` **seguía fallando**: los alias de `WindowsApps` están antes en el PATH y nada instalado después los desplaza. Por eso la ruta se **declara**, no se busca. La trampa del §11.2 de las reglas quedó ampliada con este dato, que es el que faltaba: *instalar la herramienta no arregla un PATH envenenado*.
+
+### Lo que se destapó al haber Python
+
+El `pre-commit` tiene dos motores y hasta hoy **sólo corría uno**. Al habilitar el segundo, se cayó:
+
+```
+ModuleNotFoundError: No module named 'comun'
+```
+
+**Y el hook interpretó la caída como "encontró un secreto".** El commit se frenó con el mensaje *"El revisor local encontro un secreto"*, que era falso: el revisor no encontró nada, se rompió antes de mirar.
+
+**La causa fue un error propio del paso 2.** Copié `revisar_secretos.py` a `scripts/`, que es una de las rutas donde el hook lo busca — pero el script calcula `sys.path` como `parents[1]` de su propia ubicación y espera tener `comun/` de hermano. El diseño es `herramientas/seguridad/revisar_secretos.py` con `herramientas/comun/raiz.py` al lado. Corregido con `git mv`, preservando la historia, más `herramientas/comun/raiz.py`.
+
+**Estuvo roto desde el paso 2 y nada lo avisó**, porque la ausencia de Python hacía que el motor se saltara entero con un aviso de "no corrió" que se leía como una limitación del entorno y no como un defecto.
+
+### Verificación, ejecutando
+
+| Qué | Antes | Ahora |
+|---|---|---|
+| `pre-push` → markdown | ok | ok |
+| `pre-push` → agentes (sintaxis) | **NO SÉ** | **ok** — 25 de 25 archivos compilan |
+| `pre-push` → web (build) | **NO SÉ** | **ok** |
+| `pre-commit`, motores activos | gitleaks | **gitleaks + revisor-local** |
+| Secreto inventado | frenado por 1 motor | **frenado por los 2** |
+
+**Prueba de control de la comprobación de sintaxis**, porque un verde sin control no prueba nada: se metió a propósito un archivo con `def roto(:`. `compileall` devolvió **1**. Con todo sano devuelve **0**. No es un verde vacío.
+
+Es la primera vez que algo verifica el Python de este repositorio.
+
+### Candidato a subir al manual central (paso 9)
+
+**Un escáner de seguridad que se cae no debería informar "encontró un secreto".** Frenar el commit está bien —fallar cerrado es lo correcto en un hook de seguridad—, pero el mensaje tiene que distinguir *"encontré esto"* de *"no pude mirar"*. El hook ya tiene ese vocabulario en el `pre-push`, donde un chequeo que no puede correr sale con `2 = NO SÉ`; el `pre-commit` no lo aplica a la caída de un motor. Un mensaje que atribuye un hallazgo inexistente manda a buscar un secreto que no existe.
 
 ---
 
