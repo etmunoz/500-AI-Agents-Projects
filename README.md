@@ -2,12 +2,12 @@
 
 <div align="center">
 
-[![GitHub Stars](https://img.shields.io/github/stars/ashishpatel26/500-AI-Agents-Projects?style=for-the-badge&color=yellow)](https://github.com/ashishpatel26/500-AI-Agents-Projects/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/ashishpatel26/500-AI-Agents-Projects?style=for-the-badge&color=blue)](https://github.com/ashishpatel26/500-AI-Agents-Projects/network/members)
-[![Contributors](https://img.shields.io/github/contributors/ashishpatel26/500-AI-Agents-Projects?style=for-the-badge&color=green)](https://github.com/ashishpatel26/500-AI-Agents-Projects/graphs/contributors)
+[![GitHub Stars](https://img.shields.io/github/stars/etmunoz/500-AI-Agents-Projects?style=for-the-badge&color=yellow)](https://github.com/etmunoz/500-AI-Agents-Projects/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/etmunoz/500-AI-Agents-Projects?style=for-the-badge&color=blue)](https://github.com/etmunoz/500-AI-Agents-Projects/network/members)
+[![Contributors](https://img.shields.io/github/contributors/etmunoz/500-AI-Agents-Projects?style=for-the-badge&color=green)](https://github.com/etmunoz/500-AI-Agents-Projects/graphs/contributors)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge)](CONTRIBUTION.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-red?style=for-the-badge)](LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/ashishpatel26/500-AI-Agents-Projects?style=for-the-badge)](https://github.com/ashishpatel26/500-AI-Agents-Projects/commits/main)
+[![Last Commit](https://img.shields.io/github/last-commit/etmunoz/500-AI-Agents-Projects?style=for-the-badge)](https://github.com/etmunoz/500-AI-Agents-Projects/commits/main)
 
 **The most comprehensive collection of AI agent projects, use cases, and working implementations.**
 
@@ -31,36 +31,108 @@ A curated collection of **500+ AI agent projects** — production examples, tuto
 
 ---
 
+## 📍 Status
+
+Measured 2026-09-11, with the command that produced each figure.
+
+| What | Where it stands |
+|---|---|
+| **Runnable agents** | **21**, in `agents/` — 12 LangChain, 4 CrewAI, 3 LangGraph, 1 LlamaIndex, 1 framework-free (`grep -h '^framework:' agents/*/metadata.yaml \| sort \| uniq -c`) |
+| **Catalogue entries** | **~118** curated links — 95 by framework, 28 by industry. Together with the agents, around **139 items**. The "500+" in the title is the goal the name sets, not today's count; see [Scope & limits](#-scope--limits). |
+| **Course lessons** | 3, in `crewai_mcp_course/` |
+| **Tests** | **None.** 0 test files out of 148 tracked, and no CI workflow runs Python. See [Tests](#-tests). |
+| **Docs linting** | 26 files, 0 issues (`npx markdownlint-cli2`, 2026-09-11) |
+| **Catalogue site build** | 1674 modules, 2.07 s (`npm --prefix web run build`, 2026-09-11) |
+
+> This repository is a fork of `ashishpatel26/500-AI-Agents-Projects` and **diverges from it** as of 2026-09-11. Issues, security reports and badges point here, not upstream.
+
+---
+
 ## ⚡ Quick Start
 
-Pick a framework and run an agent in under 5 minutes:
+### Browse the catalogue — no API key needed
+
+Start here if you just want to look around. Nothing below needs a credential from anyone.
 
 ```bash
-# Clone the repo
-git clone https://github.com/ashishpatel26/500-AI-Agents-Projects.git
+git clone https://github.com/etmunoz/500-AI-Agents-Projects.git
 cd 500-AI-Agents-Projects
 
-# Run any agent from the agents/ directory
+# Browse offline: every agent's README is readable as-is
+ls agents/
+
+# Or run the catalogue site locally
+npm --prefix web install
+npm --prefix web run dev
+```
+
+**What you'll see:** Vite prints a `http://localhost:5173` URL. Opening it gives you the searchable atlas — the same ~118 catalogue entries as this page, filterable by framework and industry.
+
+### Run an agent — needs your own API key
+
+```bash
 cd agents/01-web-research-agent
+python -m venv .venv && source .venv/bin/activate   # .venv/Scripts/activate on Windows
 pip install -r requirements.txt
-cp .env.example .env        # add your API key
+cp .env.example .env        # then put your key in it
 python agent.py
 ```
 
-> All agents in `agents/` are self-contained with their own `requirements.txt` and `.env.example`. No monorepo setup needed.
+**What you'll see:** the agent prints each step as it goes — the query it received, the searches it ran, the sources it found, and the report it assembled. If the key is missing it says so and stops; that is the expected first run.
+
+> Every agent in `agents/` is self-contained: its own `requirements.txt`, its own `.env.example`, its own README. No monorepo setup, and you can copy one out of here whole and it still works.
+
+**Verified 2026-09-11:** the clone URL and both `npm` commands were run as written. The `pip`/`python` block was **not** re-run on this machine — it is unchanged from the upstream repository, where it worked.
 
 ---
 
 ## 🗺️ Navigation Guide
 
+**To use it:**
+
 | I want to... | Go to |
 |---|---|
-| Run a working agent right now | [`agents/`](agents/) |
-| Browse by AI framework | [Framework-wise Use Cases](#-browse-by-framework) |
+| Run a working agent right now | [`agents/`](agents/) · index and conventions in [`agents/README.md`](agents/README.md) |
+| Browse by AI framework | [Framework Use Cases](#-browse-by-framework) |
 | Browse by industry | [Industry Use Cases](#-industry-use-cases) |
 | Understand which framework to use | [Framework Comparison](#-framework-comparison) |
-| Add my own agent | [Contributing](CONTRIBUTION.md) |
 | Learn with a course | [`crewai_mcp_course/`](crewai_mcp_course/) |
+
+**To modify it:**
+
+| I want to... | Go to |
+|---|---|
+| Add my own agent | [`CONTRIBUTION.md`](CONTRIBUTION.md) — the five mandatory files and the PR process |
+| Know the rules before I write code | [`docs/reglas/reglas_desarrollo.md`](docs/reglas/reglas_desarrollo.md) — stack, architecture, Definition of Done |
+| Get oriented as a person or an LLM | [`AGENTS.md`](AGENTS.md) — the entry point, read it first |
+| See what this repo is heading towards | [`docs/roadmap.md`](docs/roadmap.md) |
+| Work on the catalogue site | [`web/`](web/) — React 18 + Vite 6, deployed to GitHub Pages on every push to `main` |
+
+**To operate or audit it:**
+
+| I want to... | Go to |
+|---|---|
+| Report a vulnerability | [`SECURITY.md`](SECURITY.md) |
+| Know what's measured, broken and pending | [`docs/adopcion_ingenieria.md`](docs/adopcion_ingenieria.md) |
+| Understand the CI checks | [`.github/workflows/`](.github/workflows/) — 6 workflows |
+| Enable the local git hooks | `git config core.hooksPath .githooks` — needed once per clone, it is not versioned |
+
+> 🚧 Not written yet: the core manuals (`docs/manuales/`) and the threat model (`docs/riesgos.md`). Their status is tracked in [`docs/adopcion_ingenieria.md`](docs/adopcion_ingenieria.md).
+
+---
+
+## 📁 Repository structure
+
+```
+agents/              21 self-contained agents — most of the code lives here
+  NN-name/           agent.py · metadata.yaml · requirements.txt · .env.example · README.md
+crewai_mcp_course/   3-lesson CrewAI + MCP course
+web/                 the catalogue site (React 18 + Vite 6) — this is what GitHub Pages serves
+scripts/             utilities with real CI consumers (star history, secret scanning)
+.githooks/           pre-commit (secrets) and pre-push (checks)
+docs/                internal process docs — rules, roadmap, adoption status (in Spanish)
+images/              README images; star-history.svg is generated weekly, don't hand-edit it
+```
 
 ---
 
@@ -279,25 +351,68 @@ State-machine framework for complex, stateful agent workflows and RAG pipelines.
 
 Contributions are welcome! 🎉 This repo grows through community contributions.
 
-**Ways to contribute:**
-1. **Add a working agent** — create a folder in `agents/` with runnable code
-2. **Add an external link** — add a row to the industry or framework tables
-3. **Fix a broken link** — open an issue or PR
-4. **Improve documentation** — fix typos, add context, improve examples
+**Everything you need is in [`CONTRIBUTION.md`](CONTRIBUTION.md)** — what to contribute, the five mandatory files an agent folder needs, naming conventions, the PR checklist, and how to sign your commits. It is the single source; this page deliberately does not restate it.
 
-**To contribute:**
-1. Fork the repository
-2. Create a branch: `feat/agent-name` or `fix/description`
-3. Add your changes following the [Contributing Guidelines](CONTRIBUTION.md)
-4. Open a PR using the PR template
+Two things worth knowing before you open a PR:
 
-See [CONTRIBUTION.md](CONTRIBUTION.md) for full requirements (metadata.yaml, requirements.txt, etc.).
+- **Every commit needs a `Signed-off-by` line** matching its author. `git commit -s` adds it. CI rejects PRs without it.
+- **The rules that govern code in this repository** live in [`docs/reglas/reglas_desarrollo.md`](docs/reglas/reglas_desarrollo.md), including the Definition of Done.
+
+---
+
+## 🧪 Tests
+
+**There are none yet.** 0 test files out of 148 tracked, and no CI workflow executes Python — the pipeline checks Markdown, README links and commit sign-off, and nothing else. The 2,482 lines of agent code are verified by nobody.
+
+What CI *does* check, and what that does **not** cover:
+
+| Workflow | Checks | Does **not** check |
+|---|---|---|
+| `markdown-lint.yml` | Markdown defects in `README.md`, the root docs and `agents/**/*.md` | Anything about whether the code runs |
+| `link-checker.yml` | Links in **`README.md` only** | The 22 agent READMEs — their links are unverified |
+| `dco.yml` | Every commit in a PR is signed off | — |
+| `jekyll-gh-pages.yml` | The catalogue site builds, then deploys it | Whether the site is correct |
+
+Local checks run through the git hooks, once you enable them:
+
+```bash
+git config core.hooksPath .githooks   # once per clone
+sh .githooks/pre-push                 # run the checks without pushing
+```
+
+A check that **cannot** run reports `NO SÉ`, never green. Today two of three are in that state, because this machine has no Python and the check refuses to claim a pass it did not measure.
+
+The rule going forward is in [`docs/reglas/reglas_desarrollo.md`](docs/reglas/reglas_desarrollo.md) §6: every new agent ships at least one test proving it fails with a clear message when the API key is missing.
+
+---
+
+## 🎯 Scope & limits
+
+What this repository deliberately is **not**, so that nothing unmentioned is assumed to work:
+
+- **Not a monorepo.** No root `requirements.txt`, no shared environment. Each agent is self-contained on purpose — that is what lets you copy one out and have it work.
+- **Not an installable library.** Nothing in `agents/` is published to PyPI or importable. These are examples to read, run and modify.
+- **Not a product with users.** No accounts, no sessions, no stored data. The catalogue site is static with no backend.
+- **The catalogue is not exhaustive or verified entry by entry.** It is a curated link list. A project appearing here is not an endorsement that it runs.
+- **"500+" is the goal the name sets, not the current count.** There are ~139 real items today. Whether the catalogue grows to the number or the number changes is an open product decision, tracked in [`docs/roadmap.md`](docs/roadmap.md).
+- **The agents are examples, not production code.** They have no retry policy, no rate limiting and no cost ceiling beyond what each script declares. Read one before you run it: **it executes on your machine and spends your API credit.**
+- **`CONTRIBUTION.md` invites five kinds of contribution that have nowhere to live yet** — templates, integrations, evaluation harnesses, reproducible experiments, visualisation utilities. Open an issue first if you're bringing one.
+
+---
+
+## 🛠️ Engineering conventions
+
+This repository follows a central engineering manual that lives outside it, in [`etmunoz/ingenieria`](https://github.com/etmunoz/ingenieria). The manual holds general practice — how software gets built, independent of domain.
+
+**The rules specific to *this* repository** — stack, module architecture, commit conventions, Definition of Done, and the traps that already cost time — are in [`docs/reglas/reglas_desarrollo.md`](docs/reglas/reglas_desarrollo.md). They are not copied from the manual and the manual does not contain them.
+
+If you are an LLM working in this repository, start at [`AGENTS.md`](AGENTS.md).
 
 ---
 
 ## Star History
 
-[![Star History Chart](images/star-history.svg)](https://star-history.com/#ashishpatel26/500-AI-Agents-Projects&Date)
+[![Star History Chart](images/star-history.svg)](https://star-history.com/#etmunoz/500-AI-Agents-Projects&Date)
 
 <sub>Regenerated weekly from the GitHub API by [`.github/workflows/star-history.yml`](.github/workflows/star-history.yml). Click the chart for the interactive version.</sub>
 
@@ -313,6 +428,6 @@ This repository is licensed under the MIT License. See the [LICENSE](LICENSE) fi
 
 **⭐ Star this repo if you find it useful — it helps others discover it!**
 
-[Report Issue](https://github.com/ashishpatel26/500-AI-Agents-Projects/issues) • [Request Agent](https://github.com/ashishpatel26/500-AI-Agents-Projects/issues/new?template=feature_request.md) • [Contribute](CONTRIBUTION.md)
+[Report Issue](https://github.com/etmunoz/500-AI-Agents-Projects/issues) • [Request Agent](https://github.com/etmunoz/500-AI-Agents-Projects/issues/new?template=feature_request.md) • [Contribute](CONTRIBUTION.md)
 
 </div>

@@ -234,6 +234,54 @@ No se corrió `referencias_cruzadas.py`: escribe en `docs/referencias/` y su cal
 
 ---
 
+## Paso 5 — README del proyecto · 2026-09-11
+
+### Lo que se sacó por estar duplicado
+
+**La sección "Contributing".** Tenía dos listas —"Ways to contribute" (4 ítems) y "To contribute" (4 pasos)— que son un resumen parcial de `CONTRIBUTION.md`, un archivo de 8.874 B con 18 secciones. Dos copias de lo mismo, y ninguna decía ser la copia: quien leía el README creía tener el panorama de cómo contribuir y tenía un extracto.
+
+Ahora es una línea y un enlace, más las dos únicas cosas que alguien necesita saber **antes** de abrir el PR y que el README es el lugar natural para decir: que hace falta `Signed-off-by` o el CI rechaza, y dónde están las reglas que gobiernan el código.
+
+> **Duplicación detectada pero NO tocada**, porque excede este paso: `CONTRIBUTION.md` tiene su propia sección *"Security, secrets & responsible disclosure"* (línea 168) que solapa con `SECURITY.md`, y una sección *"Code of Conduct"* (línea 202) que solapa con `CODE_OF_CONDUCT.md`. Es solapamiento entre manuales, que es trabajo del paso 6.
+
+### Lo que se agregó, que no existía
+
+| Sección | Por qué |
+|---|---|
+| **Status** | No había ninguna. Seis cifras, cada una con el comando que la produjo y la fecha. Incluye las dos incómodas: 0 pruebas y ~139 ítems contra el "500+" del título. |
+| **Repository structure** | `web/` no aparecía en **ningún** `.md` del repositorio (hallazgo 6). Ahora está en el mapa, en el índice y en el Quick Start. |
+| **Tests** | Dice que no hay ninguna, y agrega la tabla de qué mira cada workflow **y qué no**. Incluye que `link-checker` sólo cubre `README.md`. |
+| **Scope & limits** | No existía. Siete límites explícitos, para que nada no mencionado se asuma funcionando. El más importante: los agentes **se ejecutan en tu máquina y gastan tu crédito**. |
+| **Engineering conventions** | El enlace al manual central y el límite con las reglas propias. |
+
+### El índice de documentación, ruteado por intención
+
+La "Navigation Guide" era una tabla de 6 filas que sólo cubría el catálogo. Ahora son tres tablas —**usar**, **modificar**, **operar o auditar**— con 15 destinos, y una nota explícita de lo que todavía **no** está escrito (`docs/manuales/`, `docs/riesgos.md`) para que el índice no prometa lo que no existe.
+
+### Las referencias al upstream
+
+**7 de las 13 corregidas** — todas las del `README.md`: los 4 badges, el `git clone` del Quick Start, el gráfico de estrellas y el pie. `grep -nE 'ashishpatel' README.md` devuelve vacío.
+
+Las 6 restantes están fuera del alcance de este paso y van al paso 8: `SECURITY.md` (2), `CODE_OF_CONDUCT.md` (1), las dos plantillas de issue (2) y `link-checker.yml` (1).
+
+### Verificación
+
+| Qué | Resultado |
+|---|---|
+| Enlaces relativos | **16 de 16** resuelven |
+| Anclas internas (`#…`) | **7 de 7** resuelven — confirmado además por MD051, que está activo |
+| `npx markdownlint-cli2` | 26 archivos, 0 hallazgos |
+| Comandos del Quick Start | `git clone` y los dos `npm` **se corrieron**. El build: 1674 módulos en 2,07 s |
+| Bloque `pip` / `python agent.py` | **No se re-corrió**: esta máquina no tiene Python. Está dicho en el propio README en vez de dejarlo pasar como verificado |
+
+### Hallazgo nuevo: el despliegue no es reproducible
+
+Al correr `npm install` apareció `web/package-lock.json`, que **no estaba versionado**. `jekyll-gh-pages.yml:41` usa `npm install` —no `npm ci`—, así que el despliegue no falla por la ausencia, pero **cada publicación a GitHub Pages resuelve las dependencias de cero**. Con `^` en `package.json` (`react: ^18.3.1`, `vite: ^6.0.1`), el sitio desplegado puede cambiar de versiones sin que ningún commit lo registre, y contradice §7.1 de las reglas: *todo artefacto derivado es regenerable desde su fuente*.
+
+**No se versionó el lockfile en este paso**: es una decisión de reproducibilidad con consecuencias propias, no un arreglo de README. Queda para el paso 7 o para una decisión del PM antes.
+
+---
+
 ## Secuencia de adopción
 
 - [x] 0. Diagnóstico — 2026-09-11
@@ -241,7 +289,7 @@ No se corrió `referencias_cruzadas.py`: escribe en `docs/referencias/` y su cal
 - [x] 2. `/ingenieria:higiene` — 2026-09-11 · `.gitignore`, `.gitattributes`, `.githooks/`, `scripts/revisar_secretos.py`
 - [x] 3. `/ingenieria:reglas` — 2026-09-11 · `docs/reglas/reglas_desarrollo.md`
 - [x] 4. `/ingenieria:estructura` — 2026-09-11 · cero movimientos; `docs/roadmap.md` creada; carpetas ausentes declaradas
-- [ ] 5. `/ingenieria:readme-proyecto`
+- [x] 5. `/ingenieria:readme-proyecto` — 2026-09-11 · 7 de 13 referencias al upstream corregidas; índice, estado, alcance y pruebas agregados
 - [ ] 6. `/ingenieria:manuales`
 - [ ] 7. `/ingenieria:auditoria`
 - [ ] 8. `/ingenieria:seguridad`
