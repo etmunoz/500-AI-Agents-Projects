@@ -125,12 +125,54 @@ Decisión deliberada de **no** ignorar `test_*.py`, que es lo que genera el agen
 
 ---
 
+## Paso 3 — Reglas de desarrollo · 2026-09-11
+
+Producido: [`docs/reglas/reglas_desarrollo.md`](reglas/reglas_desarrollo.md) — 13 secciones más 4 bloques de anexo.
+
+### Donde la plantilla y el proyecto se contradecían
+
+Cuatro choques. En tres ganó el proyecto, y el motivo quedó escrito al lado: una convención distinta con motivo no es una brecha.
+
+| # | Choque | Resolución | Motivo |
+|---|---|---|---|
+| 1 | §4.1 exige un encabezado de **siete campos** en todo archivo de código | **Gana el proyecto** | Verificado: **0 de 21** `agent.py` lo tienen; todos abren con docstring de módulo. Cada `agent.py` existe para leerse de corrido como ejemplo, y siete líneas de metadatos de proceso antes de la primera línea de enseñanza le restan a lo que el archivo hace. La trazabilidad ya está en `metadata.yaml` y en git. |
+| 2 | §2.1 exige **un solo manifiesto** de dependencias | **Gana el proyecto** | Hay 25 `requirements.txt` por diseño. Un agente tiene que poder copiarse entero fuera del repositorio y funcionar — es lo que el proyecto vende, y está declarado en `agents/README.md`. Un manifiesto raíz además obligaría a resolver conflictos entre `crewai==0.80.0` y `langchain==0.3.0` que nunca conviven en el mismo entorno. |
+| 3 | El anexo **B (base de datos relacional)** | **Bloque borrado entero** | El diagnóstico marcó el rasgo por el SQLite del agente 04, pero al mirarlo es una base de demo que el agente crea al vuelo y abre en modo solo-lectura (`?mode=ro&uri=true`). Nada de lo que el bloque exige —migraciones versionadas y reversibles, repositorios, cadena de conexión por variable de entorno, UTC— tiene dónde aplicarse. Dejarlo sería una regla que enseña a saltear las que sí. **Corrige el rasgo que este mismo informe había registrado de más.** |
+| 4 | §10.4 pide un **registro único de requerimientos** | **Declarado innecesario**, no pendiente | Lo que el repositorio recibe son aportes de agentes, no requerimientos. El contrato de cada aporte es el README del agente más los cinco archivos obligatorios. Se escribió así en vez de dejar una marca 🚧 que nadie iba a llenar. |
+
+### Bloques condicionales conservados y borrados
+
+- **Conservados:** A (interfaz web), E (componentes con LLM), F (fuentes externas), I (librería/CLI), y los inline de *material didáctico*, *sin usuarios ni autenticación*, *datos personales* y *los documentos son el producto*.
+- **Borrados:** B (ver arriba), C (contenedores), D (máquina compartida), G (portado), H (escritorio), y los inline de *múltiples usuarios o roles* y *más de una suite*.
+
+### Dos mediciones nuevas que el diagnóstico no tenía
+
+1. **`web/src/App.jsx` tiene 1.057 líneas** — por encima del umbral de 1.000 que el estándar marca como deuda técnica activa. Es además el archivo donde una interfaz acumula copias divergentes sin que nadie lo decida. Declarado en §4.4 y en el bloque A; partirlo no es trabajo de la adopción.
+2. **Sólo 4 de los 21 agentes validan la salida del modelo** (Pydantic, `with_structured_output` o `json.loads` con manejo de error). Los otros 17 la consumen tal cual. Declarado como deuda en el bloque E, y como criterio para lo que entre de ahora en adelante.
+
+También se verificó y se escribió como **propiedad a mantener**, no como observación: ningún `agent.py` usa `exec`, `eval`, `subprocess`, `os.system`, `PythonREPL` ni `shell=True`.
+
+### Verificación
+
+| Qué | Resultado |
+|---|---|
+| Huecos `<ASÍ>` sin rellenar | Ninguno |
+| Enlaces relativos del documento | 6 de 6 resuelven |
+| `AGENTS.md` apunta a las reglas con la ruta correcta | Sí — se le quitó la marca 🚧, que ya no aplicaba |
+| `npx markdownlint-cli2` | 26 archivos, 0 hallazgos |
+
+### Candidato a subir al manual central (se propone en el paso 9)
+
+La trampa del **bit de ejecución de los hooks**: `core.filemode=false` en Git para Windows hace que un `chmod +x` no llegue al índice, y git **omite en silencio** un hook no ejecutable en Linux y macOS. Es la misma forma que la trampa del CRLF —una diferencia de plataforma que en Windows parece funcionar— y le pasaría a cualquier proyecto que instale los hooks desde Windows siguiendo el paso 2 tal como está escrito hoy. El paso 2 no lo menciona.
+
+---
+
 ## Secuencia de adopción
 
 - [x] 0. Diagnóstico — 2026-09-11
 - [x] 1. `/ingenieria:puntero` — 2026-09-11 · `AGENTS.md` + `CLAUDE.md` (`@AGENTS.md`)
 - [x] 2. `/ingenieria:higiene` — 2026-09-11 · `.gitignore`, `.gitattributes`, `.githooks/`, `scripts/revisar_secretos.py`
-- [ ] 3. `/ingenieria:reglas`
+- [x] 3. `/ingenieria:reglas` — 2026-09-11 · `docs/reglas/reglas_desarrollo.md`
 - [ ] 4. `/ingenieria:estructura`
 - [ ] 5. `/ingenieria:readme-proyecto`
 - [ ] 6. `/ingenieria:manuales`

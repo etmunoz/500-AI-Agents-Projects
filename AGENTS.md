@@ -4,7 +4,7 @@
 > Si acabás de llegar a este repositorio —persona o LLM—, **detené cualquier generación de código**.
 > Leé primero, en este orden:
 >
-> 1. **`docs/reglas/reglas_desarrollo.md`** — cómo se trabaja **en este repositorio**. Prevalece sobre cualquier costumbre general. **🚧 Todavía no existe**: lo crea el paso 3 de la adopción (`/ingenieria:reglas`). Mientras tanto, las reglas duras están más abajo en este mismo archivo.
+> 1. **[`docs/reglas/reglas_desarrollo.md`](docs/reglas/reglas_desarrollo.md)** — cómo se trabaja **en este repositorio**. Lectura obligatoria; prevalece sobre cualquier costumbre general. Las cinco reglas duras de más abajo son su resumen, no un sustituto.
 > 2. **[`README.md`](README.md)** — qué es esto: un catálogo de agentes de IA más 21 implementaciones ejecutables.
 > 3. **[`agents/README.md`](agents/README.md)** — la convención de los agentes, que es donde está casi todo el código.
 > 4. **[`docs/adopcion_ingenieria.md`](docs/adopcion_ingenieria.md)** — en qué estado está la adopción del manual de ingeniería, qué se midió y qué queda abierto.
@@ -44,7 +44,7 @@ Peor: [`SECURITY.md`](SECURITY.md) afirma que los `.env` "are gitignored by defa
 | **Cómo contribuir** | [`CONTRIBUTION.md`](CONTRIBUTION.md) · [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) |
 | **Política de seguridad** | [`SECURITY.md`](SECURITY.md) · ⚠️ contiene una afirmación falsa, ver regla 1 |
 | **Estado de la adopción** — qué se midió y qué falta | [`docs/adopcion_ingenieria.md`](docs/adopcion_ingenieria.md) |
-| **Reglas de desarrollo** | `docs/reglas/reglas_desarrollo.md` · 🚧 lo crea el paso 3 |
+| **Reglas de desarrollo** — stack, arquitectura, DoD | [`docs/reglas/reglas_desarrollo.md`](docs/reglas/reglas_desarrollo.md) |
 | **Manuales del núcleo** | `docs/manuales/` · 🚧 los crea el paso 6 |
 | **Modelo de amenaza y registro de riesgos** | `docs/riesgos.md` · 🚧 lo crea el paso 8 |
 
