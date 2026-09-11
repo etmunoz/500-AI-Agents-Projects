@@ -15,9 +15,8 @@
   - ❌ `metadata.yaml`
 
 ## `AGENTS.md`
-- referencias: 12 — **3 rotas**
+- referencias: 14 — **2 rotas**
   - ❌ `metadata.yaml`
-  - ❌ `docs/riesgos.md`
   - ❌ `link-checker.yml`
 
 ## `CLAUDE.md`
@@ -28,16 +27,16 @@
 
 ## `CONTRIBUTION.md`
 - referencias: 4 — **2 rotas**
-  - ❌ `agent.py`
   - ❌ `metadata.yaml`
+  - ❌ `agent.py`
 
 ## `README.md`
-- referencias: 15 — **5 rotas**
+- referencias: 17 — **5 rotas**
   - ❌ `.github/workflows/star-history.yml`
-  - ❌ `markdown-lint.yml`
-  - ❌ `dco.yml`
-  - ❌ `link-checker.yml`
   - ❌ `jekyll-gh-pages.yml`
+  - ❌ `dco.yml`
+  - ❌ `markdown-lint.yml`
+  - ❌ `link-checker.yml`
 
 ## `SECURITY.md`
 - referencias: 2
@@ -110,79 +109,105 @@
 
 ## `agents/README.md`
 - referencias: 3 — **2 rotas**
-  - ❌ `metadata.yaml`
   - ❌ `agent.py`
+  - ❌ `metadata.yaml`
 
 ## `crewai_mcp_course/README.md`
 - referencias: 1 — **1 rotas**
   - ❌ `agent.py`
 
 ## `docs/adopcion_ingenieria.md`
-- referencias: 51 — **34 rotas**
-  - ❌ `auditoria_manuales.py`
-  - ❌ `manual_administrador.md`
-  - ❌ `revisar_secretos.py`
-  - ❌ `metadata.yaml`
-  - ❌ `manual_resolucion_problemas.md`
-  - ❌ `manual_espacio.md`
-  - ❌ `manual_seguridad.md`
-  - ❌ `manual_migracion.md`
-  - ❌ `agent.py`
-  - ❌ `package.json`
-  - ❌ `.md`
+- referencias: 57 — **36 rotas**
+  - ❌ `manual_tecnico.md`
   - ❌ `@AGENTS.md`
-  - ❌ `star-history.yml`
-  - ❌ `manual_riesgos.md`
+  - ❌ `manual_migracion.md`
   - ❌ `App.jsx`
-  - ❌ `manual_usuario.md`
-  - ❌ `docs/riesgos.md`
+  - ❌ `manual_datos_personales.md`
+  - ❌ `revisar_secretos.py`
   - ❌ `link-checker.yml`
+  - ❌ `.yml`
   - ❌ `.github/ISSUE_TEMPLATE/bug_report.md`
+  - ❌ `jekyll-gh-pages.yml`
+  - ❌ `.github/workflows/link-checker.yml`
+  - ❌ `reglas_desarrollo.md`
+  - ❌ `docs/referencias/mapa.yaml`
   - ❌ `manual_despliegue.md`
   - ❌ `referencias_cruzadas.py`
-  - ❌ `reglas_desarrollo.md`
-  - ❌ `manual_integracion.md`
-  - ❌ `scripts/revisar_secretos.py`
-  - ❌ `manual_agentes.md`
-  - ❌ `.github/ISSUE_TEMPLATE/feature_request.md`
-  - ❌ `jekyll-gh-pages.yml`
-  - ❌ `manual_datos_personales.md`
   - ❌ `.py`
-  - ❌ `.yml`
-  - ❌ `.github/workflows/link-checker.yml`
-  - ❌ `manual_tecnico.md`
+  - ❌ `auditoria_manuales.py`
   - ❌ `.jsx`
+  - ❌ `star-history.yml`
+  - ❌ `metadata.yaml`
+  - ❌ `.github/ISSUE_TEMPLATE/feature_request.md`
+  - ❌ `manual_seguridad.md`
+  - ❌ `manual_agentes.md`
+  - ❌ `manual_espacio.md`
+  - ❌ `manual_usuario.md`
+  - ❌ `agent.py`
+  - ❌ `.md`
+  - ❌ `docs/riesgos.md`
+  - ❌ `manual_administrador.md`
+  - ❌ `manual_integracion.md`
+  - ❌ `manual_riesgos.md`
   - ❌ `.js`
+  - ❌ `scripts/revisar_secretos.py`
+  - ❌ `auditoria_superficies.py`
+  - ❌ `package.json`
+  - ❌ `manual_resolucion_problemas.md`
 
 ## `docs/manuales/manual_despliegue.md`
-- referencias: 11 — **5 rotas**
-  - ❌ `.github/workflows/jekyll-gh-pages.yml`
+- referencias: 11 — **3 rotas**
   - ❌ `package.json`
-  - ❌ `manual_riesgos.md`
-  - ❌ `manual_seguridad.md`
+  - ❌ `.github/workflows/jekyll-gh-pages.yml`
   - ❌ `package-lock.json`
 
 ## `docs/manuales/manual_resolucion_problemas.md`
-- referencias: 8 — **3 rotas**
+- referencias: 8 — **2 rotas**
   - ❌ `test_algo.py`
   - ❌ `cp1252.py`
-  - ❌ `manual_riesgos.md`
+
+## `docs/manuales/manual_riesgos.md`
+- referencias: 11 — **4 rotas**
+  - ❌ `.yml`
+  - ❌ `agent.py`
+  - ❌ `revisar_secretos.py`
+  - ❌ `.md`
+
+## `docs/manuales/manual_seguridad.md`
+- referencias: 10 — **4 rotas**
+  - ❌ `agent.py`
+  - ❌ `package-lock.json`
+  - ❌ `scripts/pentest_suite.py`
+  - ❌ `revisar_secretos.py`
 
 ## `docs/reglas/reglas_desarrollo.md`
-- referencias: 20 — **10 rotas**
-  - ❌ `revisar_secretos.py`
+- referencias: 22 — **10 rotas**
+  - ❌ `star-history.yml`
   - ❌ `metadata.yaml`
+  - ❌ `revisar_secretos.py`
+  - ❌ `.yml`
   - ❌ `agent.py`
   - ❌ `.github/workflows/dco.yml`
   - ❌ `.md`
-  - ❌ `star-history.yml`
-  - ❌ `.github/workflows/markdown-lint.yml`
   - ❌ `jekyll-gh-pages.yml`
-  - ❌ `.yml`
   - ❌ `.github/workflows/link-checker.yml`
+  - ❌ `.github/workflows/markdown-lint.yml`
+
+## `docs/revisiones/auditoria_codigo_20260911.md`
+- referencias: 11 — **10 rotas**
+  - ❌ `docs/referencias/mapa.yaml`
+  - ❌ `.github/workflows/star-history.yml`
+  - ❌ `referencias_cruzadas.py`
+  - ❌ `mcp_server.py`
+  - ❌ `.py`
+  - ❌ `App.jsx`
+  - ❌ `agent.py`
+  - ❌ `auditoria_superficies.py`
+  - ❌ `auditoria_superficies.toml`
+  - ❌ `.md`
 
 ## `docs/roadmap.md`
 - referencias: 7 — **3 rotas**
-  - ❌ `.py`
   - ❌ `.jsx`
   - ❌ `.js`
+  - ❌ `.py`

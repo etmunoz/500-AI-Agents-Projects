@@ -208,7 +208,7 @@ Un archivo, una responsabilidad. Evaluar partición cerca de las **500 líneas**
 
 **Medición al 2026-09-11** (`wc -l`):
 
-- Los 21 `agent.py` están holgadamente por debajo: el mayor es `agents/16-documentation-writer/agent.py` con **195** líneas. Total 2.482.
+- Los 21 `agent.py` están holgadamente por debajo: el mayor es `agents/16-documentation-writer/agent.py` con **202** líneas. Total 2.622 (medido 2026-09-11, después de agregar las guardas de codificación).
 - `web/src/App.jsx` tiene **1.057 líneas** — **por encima del umbral de deuda técnica activa.** Queda declarado acá; partirlo no es trabajo de la adopción.
 - `web/src/content.js` tiene **512** líneas: en la zona de "evaluar partición". Es una tabla de datos, así que crecer es su naturaleza.
 
@@ -233,7 +233,7 @@ git config core.hooksPath .githooks
 ## 6. Pruebas y Calidad
 
 > [!WARNING]
-> **Este repositorio no tiene ni una sola prueba.** Medición al 2026-09-11: **0 archivos de test entre 148 versionados**, y ningún workflow de CI ejecuta Python. Son 2.482 líneas de agentes que no verifica nada. Lo que sigue es la regla que rige **desde ahora**, no una descripción del estado actual.
+> **Este repositorio no tiene ni una sola prueba.** Medición al 2026-09-11: **0 archivos de test entre 170 versionados**, y ningún workflow de CI ejecuta Python. Son 2.622 líneas de agentes que no verifica nada. Lo que sigue es la regla que rige **desde ahora**, no una descripción del estado actual.
 
 - **Framework y comando cuando existan**: `pytest`, ejecutado desde la carpeta del agente (`python -m pytest -q`). `pytest==8.3.0` ya figura en el manifiesto del agente 15.
 - **Ubicación**: el test de un agente vive junto a su `agent.py`, nombrado `test_<algo>.py`. No hay `tests/` centralizado: rompería la autocontención (§2.1).

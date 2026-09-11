@@ -47,7 +47,7 @@ Dos reglas que lo mantienen honesto:
 - **Probabilidad:** certeza. Ya pasó.
 - **Estado:** 🔴 **abierto.** 0 archivos de prueba; ningún workflow ejecuta Python. El `pre-push` local comprueba **sintaxis**, que es el estado 1 de 3: no dice nada del comportamiento.
 - **Qué lo reduciría:** un workflow que instale cada agente en un entorno limpio; una prueba por agente que confirme el fallo claro cuando falta la clave.
-- **Verificado:** `git ls-files | grep -cE 'test|spec'` → 0 archivos de prueba, sobre 148 versionados.
+- **Verificado:** `git ls-files | grep -cE 'test|spec'` → 0 archivos de prueba, sobre 170 versionados (medido 2026-09-11).
 
 ### R-03 · Una dependencia comprometida corre en la máquina de quien instala
 

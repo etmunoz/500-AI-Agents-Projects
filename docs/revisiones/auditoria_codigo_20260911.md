@@ -3,7 +3,7 @@
 **Proyecto:** `etmunoz/500-AI-Agents-Projects`
 **Audiencia:** el PM, para decidir qué atacar primero.
 **Contesta:** ¿qué hay en este repositorio que convenga tocar, y con cuánta confianza lo sabemos?
-**Alcance:** los 27 `.py` y 37 `.md` versionados. `web/` **no** se analizó — ver *Lo que no se miró*.
+**Alcance:** los 27 `.py` y 37 `.md` que había versionados **al correr la herramienta** el 2026-09-11 (los manuales de seguridad y riesgos son posteriores). `web/` **no** se analizó — ver *Lo que no se miró*.
 
 > **Auditar no es reparar.** Este documento es un reporte, no un commit. **No se borró ni se editó una sola línea de código** al producirlo. Si algo de acá amerita limpieza, va en un plan aparte con sus propias pruebas y con la confirmación explícita de que no tiene dependientes reales.
 

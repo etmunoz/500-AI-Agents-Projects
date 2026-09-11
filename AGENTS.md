@@ -16,17 +16,23 @@ Este archivo existe porque **las reglas que nadie encuentra no se cumplen**. Ant
 
 ## Lo mínimo que hay que respetar
 
-**1. No commitees un `.env`. Y no confíes en que algo te va a frenar.**
+**1. No commitees un `.env`. Y activá los hooks, que no se activan solos.**
 
-Hoy **no existe ningún `.gitignore` en este repositorio**, en ningún nivel, y no hay hooks instalados. Al mismo tiempo hay 24 carpetas con `.env.example` y la documentación te dice `cp .env.example .env` como paso de arranque. Un `git add .` sube tu clave de OpenAI y nada lo intercepta.
+Hay dos barreras y **la segunda hay que encenderla en cada clon**, porque `core.hooksPath` vive en `.git/config`, que no se versiona:
 
-Peor: [`SECURITY.md`](SECURITY.md) afirma que los `.env` "are gitignored by default". **Es falso.** Está anotado como hallazgo 1 del diagnóstico y lo repara el paso 2 (`/ingenieria:higiene`). Hasta entonces, agregá archivos por nombre —`git add ruta/al/archivo`— nunca en lote.
+```bash
+git config core.hooksPath .githooks
+```
 
-**2. Este fork diverge del upstream.** Decisión del PM del 2026-09-11. El repositorio nació como fork de `ashishpatel26/500-AI-Agents-Projects` y quedan **13 referencias al original, repartidas en 6 archivos**: `README.md` (4 badges, el `git clone` del Quick Start, el gráfico de estrellas, el pie con "Report Issue"), `SECURITY.md` (correo y advisory), `CODE_OF_CONDUCT.md` (correo de denuncias), las dos plantillas de issue (`assignees`) y `link-checker.yml` (una regla que excluye la URL del upstream). El inventario línea por línea está en [`docs/adopcion_ingenieria.md`](docs/adopcion_ingenieria.md). Se reescriben a `etmunoz/` en los pasos 5 y 8. **No agregues referencias nuevas al upstream**, y si tocás alguna de las que quedan, corregila de paso.
+Sin eso, el escáner de secretos no corre. Con eso, `gitleaks` y `revisar_secretos.py` revisan lo preparado antes de cada commit — probado el 2026-09-11 intentando commitear una clave inventada: **los dos la frenaron**.
 
-**3. Cada agente es autocontenido, y así se queda.** Su propio `requirements.txt`, su propio `.env.example`, su propio `README.md`, ejecutable con `python agent.py` sin preparar nada más. No hay `requirements.txt` en la raíz y no debe haberlo: es una decisión explícita de [`agents/README.md`](agents/README.md) y es lo que hace que el repositorio sirva para lo que sirve.
+Aun así, **agregá archivos por su ruta, nunca `git add .`** El hook es una red, no un permiso. Hay 24 carpetas con `.env.example` y el arranque documentado es copiarlo a `.env`.
 
-**4. Lo que afirmes de un agente, verificalo ejecutándolo.** Este repositorio **no tiene ni una sola prueba** —0 archivos de test entre 145 versionados— y el CI nunca ejecuta Python: valida markdown, enlaces del README y el sign-off de los PR, nada más. Son 2.482 renglones de agentes que no verifica nadie. No hay red de contención: si decís que un agente corre, corrilo.
+**2. Este fork diverge del upstream.** Decisión del PM del 2026-09-11. Nació como fork de `ashishpatel26/500-AI-Agents-Projects`, y las **13 referencias al original ya se cerraron** ese mismo día: reescritas a `etmunoz/`, salvo los dos correos del mantenedor anterior, que se **retiraron** porque dirigían vulnerabilidades y denuncias de conducta a alguien ajeno al proyecto. **No agregues referencias nuevas al upstream.**
+
+**3. Cada agente es autocontenido, y así se queda.** Su propio `requirements.txt`, su propio `.env.example`, su propio `README.md`, ejecutable con `uv venv && uv pip install -r requirements.txt && uv run python agent.py` sin preparar nada más. **Nunca se instala al Python del sistema.** No hay `requirements.txt` en la raíz y no debe haberlo: es una decisión explícita de [`agents/README.md`](agents/README.md) y es lo que hace que el repositorio sirva para lo que sirve.
+
+**4. Lo que afirmes de un agente, verificalo ejecutándolo.** Este repositorio **no tiene ni una sola prueba** —0 archivos de test entre 170 versionados, medido el 2026-09-11— y el CI nunca ejecuta Python: valida markdown, enlaces del README y el sign-off de los PR, nada más. Son 2.622 renglones de agentes que no verifica nadie. No hay red de contención: si decís que un agente corre, corrilo.
 
 **5. Ningún commit ni push por iniciativa propia.** Requiere instrucción explícita del PM en ese momento, aunque ya lo haya pedido antes en la sesión.
 
@@ -37,12 +43,12 @@ Peor: [`SECURITY.md`](SECURITY.md) afirma que los `.env` "are gitignored by defa
 | Qué | Dónde |
 |---|---|
 | **Los 21 agentes ejecutables** | [`agents/`](agents/) · índice y convención en [`agents/README.md`](agents/README.md) |
-| **El catálogo** — ~118 entradas por framework y por industria | [`README.md`](README.md) |
+| **El catálogo** — ~118 entradas por framework y por industria (medido 2026-09-11) | [`README.md`](README.md) |
 | **El curso de CrewAI + MCP** — 3 lecciones | [`crewai_mcp_course/`](crewai_mcp_course/) |
-| **La SPA del atlas** — React 18 + Vite 6, desplegada a GitHub Pages | [`web/`](web/) · ⚠️ sin documentar, ver hallazgo 6 del diagnóstico |
+| **La SPA del atlas** — React 18 + Vite 6, desplegada a GitHub Pages | [`web/`](web/) · cómo se publica: [`manual_despliegue.md`](docs/manuales/manual_despliegue.md) |
 | **CI** — 6 workflows | [`.github/workflows/`](.github/workflows/) |
 | **Cómo contribuir** | [`CONTRIBUTION.md`](CONTRIBUTION.md) · [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) |
-| **Política de seguridad** | [`SECURITY.md`](SECURITY.md) · ⚠️ contiene una afirmación falsa, ver regla 1 |
+| **Política de seguridad** — cómo reportar | [`SECURITY.md`](SECURITY.md) |
 | **Estado de la adopción** — qué se midió y qué falta | [`docs/adopcion_ingenieria.md`](docs/adopcion_ingenieria.md) |
 | **Reglas de desarrollo** — stack, arquitectura, DoD | [`docs/reglas/reglas_desarrollo.md`](docs/reglas/reglas_desarrollo.md) |
 | **Cómo se despliega el catálogo web** | [`docs/manuales/manual_despliegue.md`](docs/manuales/manual_despliegue.md) |

@@ -560,6 +560,94 @@ Las 6 que quedaban: `link-checker.yml`, las dos plantillas de issue, y los dos c
 
 ---
 
+## Paso 9 — Cierre · 2026-09-11
+
+### Verificación cruzada: los 11 hallazgos del paso 0, uno por uno
+
+Releído desde el diagnóstico, no desde el último paso. Cada hallazgo tiene una de tres respuestas; **no hay una cuarta**.
+
+| # | Hallazgo del diagnóstico | | Evidencia, o dónde vive ahora |
+|---|---|---|---|
+| 1 | Sin `.gitignore`, y `SECURITY.md` afirmando lo contrario | ✅ **Resuelto** | `.gitignore` + hook probado con una clave inventada: frenada por los dos motores. `git check-ignore` confirma `.env` ignorado y `.env.example` versionable. Registrado como R-06 y R-09 |
+| 2 | Sin hooks instalados | ✅ **Resuelto** | `core.hooksPath=.githooks`, modos `100755` verificados **en un clon limpio**. R-07 y R-08 |
+| 3 | Cero pruebas | 🔴 **Abierto** | → **R-02** en el registro de riesgos. Sigue en 0 sobre 170 versionados. **Ya se materializó dos veces** durante esta adopción |
+| 4 | 13 referencias al upstream | ✅ **Resuelto** | `grep` no devuelve ninguna fuera de `docs/`. Los dos correos **retirados**, no reemplazados. R-10 |
+| 5 | "500+" contra ~139 ítems reales | 🟡 **Abierto, es de producto** | → [`docs/roadmap.md`](roadmap.md), horizonte *Después*. Crecer o cambiar el número: decisión del PM |
+| 6 | `web/` sin documentar en ningún `.md` | ✅ **Resuelto** | Está en el README (mapa, índice, Quick Start) y tiene [`manual_despliegue.md`](manuales/manual_despliegue.md) |
+| 7 | Ningún `.md` con encabezado de audiencia y fecha | 🟡 **Parcial** | Los 8 de `docs/` lo tienen. Los 26 de la raíz y `agents/` **no**. → deuda declarada en las reglas §10.5 |
+| 8 | `link-checker` solo revisa `README.md` | 🔴 **Abierto** | Declarado en las reglas §2.2 y en la sección *Tests* del README. Los 22 README de `agents/` siguen sin verificar |
+| 9 | El agente 21 manda PII a un tercero sin modelo de amenaza | ✅ **Resuelto** el modelo | Está en [`manual_seguridad.md`](manuales/manual_seguridad.md). El control técnico sigue faltando → **R-05** |
+| 10 | Sin hoja de ruta | ✅ **Resuelto** | [`docs/roadmap.md`](roadmap.md), sembrada sólo con intenciones ya escritas |
+| 11 | Python no instalado | ✅ **Resuelto** | `uv` + cpython 3.13.13 declarado. Destapó el escáner de secretos mal instalado |
+
+**Ninguno se perdió.** 7 resueltos, 1 parcial, 3 abiertos — y los 3 abiertos tienen dueño: dos en el registro de riesgos, uno en la hoja de ruta.
+
+### Comprobado ejecutando, no leyendo
+
+| Qué | Comando | Resultado |
+|---|---|---|
+| Linter de documentación | `npx markdownlint-cli2` | 26 archivos, **0 hallazgos** |
+| Sintaxis de todo el Python | `python -m compileall -q agents crewai_mcp_course` | **25/25**, y la prueba de control con un archivo roto devolvió 1 |
+| Build del catálogo | `npm --prefix web ci && npm run build` | verde |
+| Enlaces cruzados | `referencias_cruzadas.py --config …` | 195 objetos, 1248 aristas, 11 hallazgos — **1 falso positivo de la herramienta, 10 de framework** |
+| El hook frena un secreto | commit de una clave inventada | **frenado por los dos motores** |
+| El agente de referencia corre | `uv venv && uv pip install && uv run python agent.py` | llega al 401 de la clave de ejemplo |
+
+### Cifras que envejecieron durante el propio trabajo
+
+Recorridas las afirmaciones contables y corregidas **con su fecha**, que es la corrección barata:
+
+- `148 versionados` → **170** (4 documentos)
+- `145 versionados` → **170** (`AGENTS.md`)
+- `2.482 líneas` → **2.622** (las guardas de codificación sumaron 140)
+- `195 líneas` el mayor `agent.py` → **202**
+- El alcance de la auditoría quedó fechado *"al correr la herramienta"*, porque dos manuales son posteriores
+
+**Y `AGENTS.md` era el documento que más mentía**, que es lo peor posible porque es la puerta de entrada: su regla 1 seguía diciendo *"no existe ningún `.gitignore` y no hay hooks instalados"*, escrito en el paso 1 cuando era cierto. Reescrita, junto con las referencias a `python agent.py`, el aviso de `web/` sin documentar y el de `SECURITY.md` falso.
+
+### Lo que este proyecto le debe al manual central
+
+Cuatro cosas, todas encontradas ejecutando. Ninguna nombra este dominio.
+
+**1. Instalar la herramienta no arregla un PATH envenenado.** El manual advierte que en Windows `command -v python` encuentra alias de la Microsoft Store que fallan al ejecutarse, y prescribe probar con `-c ""`. Lo que no dice: **instalar un Python real no desplaza esos alias**, porque están antes en el PATH. Medido — con `uv` instalado y 3.13.13 funcionando, `python3 -c ""` seguía fallando. La consecuencia práctica es que declarar la ruta con `git config --local ingenieria.python` **no es una comodidad para casos raros: es el camino normal en Windows**, y el paso 2 lo presenta como excepción.
+
+**2. Un escáner de seguridad que se cae no debe informar "encontró un secreto".** El `pre-commit` trata la caída de un motor como hallazgo. Frenar está bien —fallar cerrado es correcto—, pero el mensaje tiene que separar *"encontré esto"* de *"no pude mirar"*. El mismo hook ya tiene ese vocabulario en el `pre-push`, con su código `2 = NO SÉ`. Un mensaje que atribuye un hallazgo inexistente manda a buscar un secreto que no existe. **Mecanismo propuesto:** un código de salida distinto para "motor caído", y que el resumen lo liste aparte de los hallazgos.
+
+**3. Un `chmod +x` no llega al índice desde Windows, y git omite el hook en silencio.** `core.filemode=false` es el valor por defecto de Git para Windows. Es la misma forma que la trampa del CRLF que el paso 2 **sí** documenta —una diferencia de plataforma que en Windows parece funcionar— y le va a pasar a **todo proyecto que instale los hooks desde Windows siguiendo el paso 2 tal como está escrito hoy**. **Mecanismo propuesto:** que el paso 2 verifique los modos con `git ls-files -s` en un clon limpio, junto al ensayo del secreto que ya exige.
+
+**4. `referencias_cruzadas.py` reporta roto todo enlace a una carpeta que empiece con punto**, porque las salta al recorrer el árbol y su contenido nunca entra al índice. En cualquier repositorio con GitHub Actions está garantizado: `.github/workflows/` es justo lo que un README enlaza, y el falso hallazgo es indistinguible de uno real. **Y la herramienta se cae si `--salida-dir` apunta fuera del repositorio** (`ValueError` en `relative_to`), que es exactamente como el paso 0 instruye a invocarla.
+
+---
+
+## Cierre
+
+**Qué cambió.** El repositorio no tenía puerta de entrada, ni reglas, ni `.gitignore` en ningún nivel, ni hooks, ni manuales, ni hoja de ruta. Ahora tiene todo eso, más un registro de riesgos, un modelo de amenaza y una auditoría de código con su herramienta calibrada.
+
+**Lo que más valió no fue el papeleo.** Tres defectos llevaban ahí desde antes del fork y ninguno se había notado, porque **nada de este repositorio se ejecuta nunca**: `SECURITY.md` prometía una protección inexistente; el agente de referencia —el primero que el README manda a correr— **no se podía instalar**; y 23 de 25 archivos Python morían en el primer `print` en una consola Windows. Aparecieron los tres **al ejecutar cosas que estaban escritas y nadie había corrido**.
+
+**Qué quedó abierto, y dónde vive cada cosa:**
+
+| Pendiente | Dónde vive ahora |
+|---|---|
+| Cero pruebas; nada verifica comportamiento | [`manual_riesgos.md`](manuales/manual_riesgos.md) **R-02** |
+| Un aporte malicioso corre en máquinas ajenas | **R-01** |
+| Dependencias sin verificar | **R-03** |
+| 17 de 21 agentes no validan la salida del modelo | **R-04** |
+| Datos personales sin control técnico | **R-05** |
+| `link-checker` solo cubre `README.md` | **R-02** (mismo hueco de verificación) |
+| Encabezados de audiencia y fecha en 26 `.md` | Reglas §10.5, deuda declarada |
+| "500+" contra ~139 ítems | [`roadmap.md`](roadmap.md) — decisión de producto |
+| Las 5 categorías que `CONTRIBUTION.md` promete y no existen | [`roadmap.md`](roadmap.md) |
+| `App.jsx` con 1.057 líneas | Reglas §4.4 y anexo A, deuda declarada |
+| El router muerto del agente 13 | [`auditoria_codigo_20260911.md`](revisiones/auditoria_codigo_20260911.md) |
+| Publicar o no una dirección de contacto directa | Comentario en `SECURITY.md` y `CODE_OF_CONDUCT.md` |
+
+**Ningún pendiente queda viviendo dentro de este documento.** Nadie relee un informe cerrado para ver qué falta.
+
+> **A partir de acá este registro es un documento congelado.** No se edita más: es el registro de qué se decidió y con qué información. Lo que siga vivo se sigue en el registro de riesgos y en la hoja de ruta.
+
+---
+
 ## Secuencia de adopción
 
 - [x] 0. Diagnóstico — 2026-09-11
@@ -571,4 +659,4 @@ Las 6 que quedaban: `link-checker.yml`, las dos plantillas de issue, y los dos c
 - [x] 6. `/ingenieria:manuales` — 2026-09-11 · 2 escritos, `SECURITY.md` partido, contrato de README de agente, 6 huecos declarados
 - [x] 7. `/ingenieria:auditoria` — 2026-09-11 · 1 hallazgo real (alta confianza, severidad baja), 10 falsos positivos confirmados
 - [x] 8. `/ingenieria:seguridad` — 2026-09-11 · modelo de amenaza, 9 superficies (4 cubiertas), 12 riesgos (5 abiertos), 13 referencias al upstream cerradas
-- [ ] 9. `/ingenieria:cierre`
+- [x] 9. `/ingenieria:cierre` — 2026-09-11 · 11 hallazgos contestados, 4 propuestas al manual central, registro congelado

@@ -8,12 +8,12 @@
 | Tipo | Cantidad |
 |---|---|
 | constante | 33 |
-| documento | 37 |
+| documento | 40 |
 | funcion | 94 |
 | modulo | 27 |
 | recurso | 1 |
 
-**Aristas (relaciones):** 1204
+**Aristas (relaciones):** 1248
 
 ## Resumen de hallazgos
 

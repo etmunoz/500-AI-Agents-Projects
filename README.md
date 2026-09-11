@@ -40,7 +40,7 @@ Measured 2026-09-11, with the command that produced each figure.
 | **Runnable agents** | **21**, in `agents/` — 12 LangChain, 4 CrewAI, 3 LangGraph, 1 LlamaIndex, 1 framework-free (`grep -h '^framework:' agents/*/metadata.yaml \| sort \| uniq -c`) |
 | **Catalogue entries** | **~118** curated links — 95 by framework, 28 by industry. Together with the agents, around **139 items**. The "500+" in the title is the goal the name sets, not today's count; see [Scope & limits](#-scope--limits). |
 | **Course lessons** | 3, in `crewai_mcp_course/` |
-| **Tests** | **None.** 0 test files out of 148 tracked, and no CI workflow runs Python. See [Tests](#-tests). |
+| **Tests** | **None.** 0 test files out of 170 tracked (measured 2026-09-11), and no CI workflow runs Python. See [Tests](#-tests). |
 | **Docs linting** | 26 files, 0 issues (`npx markdownlint-cli2`, 2026-09-11) |
 | **Catalogue site build** | 1674 modules, 2.07 s (`npm --prefix web run build`, 2026-09-11) |
 
@@ -372,7 +372,7 @@ Two things worth knowing before you open a PR:
 
 ## 🧪 Tests
 
-**There are none yet.** 0 test files out of 148 tracked, and no CI workflow executes Python — the pipeline checks Markdown, README links and commit sign-off, and nothing else. The 2,482 lines of agent code are verified by nobody.
+**There are none yet.** 0 test files out of 170 tracked (measured 2026-09-11), and no CI workflow executes Python — the pipeline checks Markdown, README links and commit sign-off, and nothing else. The 2,622 lines of agent code are verified by nobody.
 
 What CI *does* check, and what that does **not** cover:
 
