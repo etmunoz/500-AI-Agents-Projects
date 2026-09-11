@@ -16,6 +16,13 @@ from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
+import sys
+
+# Windows consoles default to cp1252, which cannot encode the emoji this
+# script prints -- it would die on the first print. Harmless elsewhere.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 load_dotenv()
 
 TEST_PROMPT = """You are an expert Python test engineer. Generate a comprehensive pytest test suite for the provided code.

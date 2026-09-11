@@ -35,7 +35,7 @@ Sin esto, dos documentos que se contradicen se resuelven por quien lo leyó últ
 - **Operación**: local para los agentes (cada uno se ejecuta en la máquina de quien lo clona); GitHub Pages para el catálogo web. Sin servidor propio, sin usuarios, sin autenticación.
 - **Idioma del código**: **inglés** para variables, comentarios, docstrings, nombres de carpeta y mensajes de commit. La documentación de proceso interno —este archivo, `docs/adopcion_ingenieria.md`, `AGENTS.md`— está en español. El catálogo y los README de agentes, en inglés: su audiencia es la comunidad.
 - **Entorno**: Python ≥3.9, un entorno por agente con `pip` y `requirements.txt` — el intérprete se obtiene con **`uv`** (§2.3). Node ≥18 con `npm` para `web/`.
-- **Interfaz**: CLI por agente (`python agent.py`) + una SPA estática de catálogo.
+- **Interfaz**: CLI por agente (`uv run python agent.py`) + una SPA estática de catálogo.
 - **Origen**: fork de `ashishpatel26/500-AI-Agents-Projects`. **Decisión del PM del 2026-09-11: este fork diverge.** No se agregan referencias nuevas al upstream; las **13 que quedan, repartidas en 6 archivos**, se reescriben en los pasos 5 y 8 de la adopción. Inventario línea por línea en [`docs/adopcion_ingenieria.md`](../adopcion_ingenieria.md).
 
 ### 1.1. Lo que este proyecto no es
@@ -69,7 +69,7 @@ Sin esto, dos documentos que se contradicen se resuelven por quien lo leyó últ
 | Catálogo web | React 18 + Vite 6, `lucide-react` para iconos |
 | CI | GitHub Actions — 6 workflows |
 | Linter de documentación | `markdownlint-cli2` con `.markdownlint-cli2.jsonc` |
-| Hooks | `.githooks/` vía `core.hooksPath`; `gitleaks` en Docker + `scripts/revisar_secretos.py` |
+| Hooks | `.githooks/` vía `core.hooksPath`; `gitleaks` en Docker + `herramientas/seguridad/revisar_secretos.py` |
 
 ### 2.1. Reglas de dependencias
 
@@ -278,7 +278,7 @@ El error caro no es equivocarse: es **afirmar más de lo que se midió**.
 - **Criterio de aceptación del catálogo web:**
 
   ```bash
-  rm -rf web/node_modules web/dist && npm --prefix web install && npm --prefix web run build
+  rm -rf web/node_modules web/dist && npm --prefix web ci && npm --prefix web run build
   ```
 
 - **Criterio de aceptación de un agente:** en la carpeta del agente, sin `.venv` previo,
@@ -441,7 +441,7 @@ uv venv --clear && uv pip install -r requirements.txt
 "$(git config --get ingenieria.python)" -m compileall -q agents crewai_mcp_course
 
 # Catálogo web en desarrollo
-npm --prefix web install
+npm --prefix web ci
 npm --prefix web run dev
 
 # Construir el catálogo para producción

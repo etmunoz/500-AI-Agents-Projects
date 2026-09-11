@@ -62,7 +62,7 @@ cd 500-AI-Agents-Projects
 ls agents/
 
 # Or run the catalogue site locally
-npm --prefix web install
+npm --prefix web ci
 npm --prefix web run dev
 ```
 
@@ -86,7 +86,7 @@ uv run python agent.py
 
 > Every agent in `agents/` is self-contained: its own `requirements.txt`, its own `.env.example`, its own README. No monorepo setup, and you can copy one out of here whole and it still works.
 
-**Verified 2026-09-11:** the clone URL and both `npm` commands were run as written. The `pip`/`python` block was **not** re-run on this machine — it is unchanged from the upstream repository, where it worked.
+**Verified 2026-09-11:** every command in this section was run as written on Windows, including the agent — which reaches the model call and stops on the placeholder key.
 
 ---
 
@@ -134,7 +134,8 @@ agents/              21 self-contained agents — most of the code lives here
   NN-name/           agent.py · metadata.yaml · requirements.txt · .env.example · README.md
 crewai_mcp_course/   3-lesson CrewAI + MCP course
 web/                 the catalogue site (React 18 + Vite 6) — this is what GitHub Pages serves
-scripts/             utilities with real CI consumers (star history, secret scanning)
+scripts/             star-history generator, called by its workflow
+herramientas/        secret scanner used by the pre-commit hook
 .githooks/           pre-commit (secrets) and pre-push (checks)
 docs/                internal process docs — rules, roadmap, adoption status (in Spanish)
 images/              README images; star-history.svg is generated weekly, don't hand-edit it

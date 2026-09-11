@@ -4,7 +4,7 @@
 **Audiencia:** quien necesita publicar el catálogo web, o entender por qué una publicación falló o salió distinta a lo esperado.
 **Contesta:** ¿cómo se pone el sitio del catálogo en producción desde cero, y qué lo rompe?
 **Fecha de creación:** 2026-09-11
-**Última actualización:** 2026-09-11 — creación
+**Última actualización:** 2026-09-11 — lockfile versionado y workflow a `npm ci`
 
 ---
 
@@ -62,7 +62,7 @@ Al terminar esto vas a poder publicar el sitio desde un fork recién hecho, ente
 | `actions/checkout@v4` | Clona el repositorio | — |
 | `actions/setup-node@v4` | Node **22** | Localmente probado con Node 24. Si algo compila acá y no allá, empezar por esta diferencia |
 | `actions/configure-pages@v5` | Prepara el entorno de Pages | Falla si Pages no está habilitado — ver el paso 1 de arriba |
-| `npm install` en `web/` | Instala dependencias | **Resuelve de cero en cada corrida** — ver *Límites conocidos* |
+| `npm ci` en `web/` | Instala exactamente lo que fija `package-lock.json` | Falla si el lockfile no coincide con `package.json` — commitealos juntos |
 | `npm run build` en `web/` | `vite build` → `web/dist/` | Referencia local: 1674 módulos en 2,07 s (2026-09-11) |
 | `upload-pages-artifact@v3` | Sube `web/dist` | — |
 | `deploy-pages@v4` | Publica | Sólo fuera de un PR |
@@ -74,7 +74,7 @@ Al terminar esto vas a poder publicar el sitio desde un fork recién hecho, ente
 ## Construir y previsualizar en local
 
 ```bash
-npm --prefix web install
+npm --prefix web ci             # exactamente lo que fija el lockfile
 npm --prefix web run build      # produce web/dist/
 npm --prefix web run preview    # sirve web/dist/ como lo haría Pages
 ```
@@ -98,7 +98,7 @@ El workflow se dispara solo y republica. **No se edita `web/dist/` a mano**: es 
 
 ## Límites conocidos
 
-- **El despliegue no es reproducible.** El workflow usa `npm install`, no `npm ci`, y **no hay `package-lock.json` versionado**. Con rangos `^` en [`web/package.json`](../../web/package.json) (`react: ^18.3.1`, `vite: ^6.0.1`), dos publicaciones del mismo commit pueden embarcar versiones distintas de dependencias, y **ningún commit lo registra**. Contradice §7.1 de las reglas. Pendiente de decisión: versionar el lockfile.
+- ~~El despliegue no es reproducible.~~ **Resuelto el 2026-09-11.** `web/package-lock.json` está versionado y el workflow usa `npm ci`, que instala exactamente lo bloqueado y falla si el lockfile no coincide con `package.json`. Antes usaba `npm install` sin lockfile: con rangos `^` en [`web/package.json`](../../web/package.json), dos publicaciones del mismo commit podían embarcar versiones distintas sin que nada lo registrara. **Consecuencia práctica:** cambiar una dependencia ahora exige commitear el lockfile junto al `package.json`, o el despliegue falla — que es el punto.
 - **El `base` de Vite está fijo al nombre del repositorio.** Un fork con otro nombre publica un sitio en blanco, sin error visible.
 - **Las variables `VITE_*` se hornean en tiempo de build.** Cambiarlas en el entorno de Pages después de construir no tiene ningún efecto: hay que reconstruir. Hoy el proyecto no usa ninguna, pero es la trampa que aparece la primera vez que se agrega una.
 - **Nada verifica que el sitio publicado sea correcto.** El workflow comprueba que *compile*, no que funcione: no hay prueba de humo, ni verificación de enlaces sobre el sitio construido, ni captura comparada. Un cambio que compila y rompe la navegación se publica sin resistencia.

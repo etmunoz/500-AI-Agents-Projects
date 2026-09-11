@@ -119,6 +119,8 @@ Decisión deliberada de **no** ignorar `test_*.py`, que es lo que genera el agen
 
 **`scripts/revisar_secretos.py`** — el segundo motor del hook, en una de las rutas donde `pre-commit` lo busca por convención.
 
+> **Corregido después.** Esa ubicación estaba mal y rompía el `import` del script: vive en `herramientas/seguridad/` con `herramientas/comun/` al lado. No se detectó hasta que hubo Python y el motor pudo correr. Detalle en *Migración a `uv`*, más abajo. Esta línea se conserva como quedó escrita porque es el registro de lo que se hizo ese día.
+
 ### Verificación — ejecutando, no leyendo
 
 | Qué se probó | Resultado |
@@ -401,6 +403,29 @@ UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d'
 Los agentes imprimen emoji y la consola de Windows usa cp1252. **Barrido: 23 de los 25 archivos Python contienen caracteres fuera de cp1252.** Con `PYTHONUTF8=1` el agente 01 pasó de caerse en el primer `print` a correr entero hasta la llamada al modelo, donde falló con un 401 por la clave de ejemplo — que es exactamente el criterio de aceptación de §7.1.
 
 No se corrigieron los 23 archivos: excede el alcance y es decisión del PM si los agentes dejan de imprimir emoji o si el proyecto declara `PYTHONUTF8=1` como requisito. Queda en el manual de resolución de problemas con su paliativo, y como deuda declarada.
+
+#### Los dos, corregidos
+
+**Defecto 1** — manifiesto reparado al conjunto 0.3.x. Verificado corriendo el criterio de aceptación de §7.1 completo: `uv venv --clear && uv pip install -r requirements.txt && cp .env.example .env && uv run python agent.py` llega hasta el 401 de la clave de ejemplo.
+
+**Defecto 2** — guarda de codificación inline en los **23** archivos afectados, insertada después del bloque de imports:
+
+```python
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+```
+
+Va **inline y no en un módulo compartido** porque un módulo compartido rompería la autocontención de §2.1, que es regla dura: un agente tiene que poder copiarse entero. Se probaron las dos variantes antes de elegir — sin guarda muere en el primer `print`; con guarda el emoji **renderiza correctamente**, no sale como texto ilegible. Los 25 archivos siguen compilando.
+
+Los 2 archivos sin emoji no se tocaron. El paliativo `PYTHONUTF8=1` queda documentado igual en el manual de resolución de problemas, porque sigue sirviendo para código de terceros.
+
+#### Lockfile del catálogo web
+
+`web/package-lock.json` versionado, y el workflow pasó de `npm install` a **`npm ci`**, que es lo que le da sentido: instala exactamente lo bloqueado y **falla si el lockfile no coincide** con `package.json`. Verificado localmente: `npm ci` + `npm run build` en verde. La contrapartida, escrita en el manual de despliegue: cambiar una dependencia ahora obliga a commitear el lockfile junto al `package.json`.
+
+#### Un tercero, causado por la propia migración
+
+Documentar `uv venv` dentro de la carpeta del agente hizo que el glob `agents/**/*.md` empezara a matchear markdown **dentro de `.venv/`**, y `markdownlint` reportó un defecto en el archivo de licencia de un paquete ajeno (26 → 35 archivos). Lo insidioso: **el CI no lo ve**, porque no instala nada — el chequeo quedaba verde en CI y rojo para cualquiera que siguiera el README. `.markdownlint-cli2.jsonc` ahora ignora `.venv`, `node_modules` y `__pycache__`. Vuelto a 26 archivos, 0 hallazgos.
 
 #### Lo que los dos tienen en común
 

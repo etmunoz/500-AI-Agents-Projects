@@ -38,7 +38,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Install website dependencies
-        run: npm install
+        run: npm ci
         working-directory: web
 
       - name: Build React atlas
