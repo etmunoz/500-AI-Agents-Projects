@@ -512,6 +512,54 @@ Los 10 falsos: 9 de invocación por framework (`@mcp.tool()` y `_run` de `BaseTo
 
 ---
 
+## Paso 8 — Seguridad · 2026-09-11
+
+Producidos: [`manual_seguridad.md`](manuales/manual_seguridad.md) (modelo de amenaza + inventario de superficie) y [`manual_riesgos.md`](manuales/manual_riesgos.md) (registro con 12 riesgos).
+
+### La superficie de este repositorio no es un servidor
+
+Es **la máquina de otra gente**. No hay backend, ni autenticación, ni endpoints, ni datos de usuarios. Lo que hay es código que se publica para que desconocidos lo ejecuten con sus claves y su crédito. Todo el modelo de amenaza parte de ahí, y **el adversario principal es un aporte malicioso**, no un atacante de red.
+
+### Cobertura medida
+
+**4 de 9 superficies cubiertas o fuera de alcance con firma; 5 descubiertas o parciales.**
+
+Las tres `fuera_de_alcance` llevan motivo y firma del PM: el sitio publicado (estático, sin entrada de usuario), autenticación y autorización (no existen), y el servidor MCP del curso (didáctico, `localhost`, sin efectos).
+
+### Riesgos: 5 abiertos, 5 mitigados, 2 aceptados
+
+Los mitigados lo son **con evidencia de verificación**, no por haber escrito el arreglo:
+
+| | Cómo se verificó |
+|---|---|
+| R-06 secretos al historial | Clave **inventada** frenada por los dos motores + barrido de `git log --all -p` |
+| R-07 hooks sin bit de ejecución | `git ls-files -s` **en un clon limpio**, no en el índice local |
+| R-08 CRLF en hooks | `file` sobre el hook + `git add --renormalize` sin cambios |
+| R-09 documentación que mentía | `git check-ignore` sobre `.env`, `.env.local` y `.env.example` |
+| R-10 reportes a un tercero | `grep` de las 13 referencias → cero fuera de `docs/` |
+
+**R-02 no es teórico: ya se materializó dos veces** — el manifiesto insatisfacible del agente de referencia y los 23 archivos que morían en el primer `print`. Está abierto porque sigue sin haber pruebas.
+
+### Por qué no hay arnés de pentest
+
+**No aplica, y se declara — no queda pendiente.** El arnés del manual ataca endpoints, autenticación, autorización y escalada de privilegios. Este repositorio no tiene **ninguna** de esas cosas. Copiarlo dejaría una lista de chequeos apuntando a rutas inexistentes, y una lista mitad ruido enseña a ignorarla.
+
+**En su lugar se corrieron cinco ejercicios sobre la superficie que sí existe**, todos ejecutando y ninguno dado por bueno leyendo: el señuelo de secreto, el bit de ejecución en clon limpio, la búsqueda de ejecución dinámica (cero `exec`/`eval`/`subprocess`), el barrido de claves en el historial (cero), y la revisión de permisos del despliegue.
+
+### Las 13 referencias al upstream, cerradas
+
+Las 6 que quedaban: `link-checker.yml`, las dos plantillas de issue, y los dos correos.
+
+**Los dos correos se retiraron en vez de reemplazarse.** Dirigían vulnerabilidades y denuncias de conducta al mantenedor del repositorio original — alguien ajeno a este fork, que no puede actuar sobre ellas. Ahora los reportes de seguridad van al advisory privado de GitHub de este repositorio, y los de conducta al perfil del mantenedor.
+
+> **Decisión pendiente del PM:** este proyecto **no publica una dirección de correo directa**. No se puso la tuya sin preguntar: anunciar una dirección de contacto es un compromiso público de respuesta, y esa decisión es tuya. Hay un comentario en cada archivo diciendo exactamente eso.
+
+### Límite declarado
+
+**Un hook local no protege de un PR ajeno.** Corre en la máquina de quien commitea. Contra R-01 —el adversario principal— el único control es la revisión manual, que no escala y no tiene red. No hay `bandit`, ni `pip-audit`, ni `npm audit` bloqueante, ni escaneo de secretos del lado del servidor.
+
+---
+
 ## Secuencia de adopción
 
 - [x] 0. Diagnóstico — 2026-09-11
@@ -522,5 +570,5 @@ Los 10 falsos: 9 de invocación por framework (`@mcp.tool()` y `_run` de `BaseTo
 - [x] 5. `/ingenieria:readme-proyecto` — 2026-09-11 · 7 de 13 referencias al upstream corregidas; índice, estado, alcance y pruebas agregados
 - [x] 6. `/ingenieria:manuales` — 2026-09-11 · 2 escritos, `SECURITY.md` partido, contrato de README de agente, 6 huecos declarados
 - [x] 7. `/ingenieria:auditoria` — 2026-09-11 · 1 hallazgo real (alta confianza, severidad baja), 10 falsos positivos confirmados
-- [ ] 8. `/ingenieria:seguridad`
+- [x] 8. `/ingenieria:seguridad` — 2026-09-11 · modelo de amenaza, 9 superficies (4 cubiertas), 12 riesgos (5 abiertos), 13 referencias al upstream cerradas
 - [ ] 9. `/ingenieria:cierre`

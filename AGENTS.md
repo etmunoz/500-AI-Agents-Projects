@@ -47,7 +47,9 @@ Peor: [`SECURITY.md`](SECURITY.md) afirma que los `.env` "are gitignored by defa
 | **Reglas de desarrollo** — stack, arquitectura, DoD | [`docs/reglas/reglas_desarrollo.md`](docs/reglas/reglas_desarrollo.md) |
 | **Cómo se despliega el catálogo web** | [`docs/manuales/manual_despliegue.md`](docs/manuales/manual_despliegue.md) |
 | **Algo falló, qué hago** | [`docs/manuales/manual_resolucion_problemas.md`](docs/manuales/manual_resolucion_problemas.md) |
-| **Modelo de amenaza y registro de riesgos** | `docs/riesgos.md` · 🚧 lo crea el paso 8 |
+| **Modelo de amenaza y superficie** | [`docs/manuales/manual_seguridad.md`](docs/manuales/manual_seguridad.md) |
+| **Registro de riesgos** — qué está abierto | [`docs/manuales/manual_riesgos.md`](docs/manuales/manual_riesgos.md) |
+| **Auditoría de código** | [`docs/revisiones/auditoria_codigo_20260911.md`](docs/revisiones/auditoria_codigo_20260911.md) · grafo en [`docs/referencias/`](docs/referencias/) |
 
 ---
 

@@ -260,4 +260,4 @@ Verificado el 2026-09-11: al declarar el intérprete, la comprobación pasó de 
 | ¿Cuáles son las reglas del repositorio? | [`docs/reglas/reglas_desarrollo.md`](../reglas/reglas_desarrollo.md) — §11.2 tiene las trampas con su mecanismo |
 | ¿Qué es esto y cómo empiezo? | [`README.md`](../../README.md) |
 | ¿Cómo contribuyo? | [`CONTRIBUTION.md`](../../CONTRIBUTION.md) |
-| ¿Qué puede salir mal y qué sigue abierto? | 🚧 `manual_riesgos.md` — lo escribe el paso 8 de la adopción |
+| ¿Qué puede salir mal y qué sigue abierto? | [`manual_riesgos.md`](manual_riesgos.md) |

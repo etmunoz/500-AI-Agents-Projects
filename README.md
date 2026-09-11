@@ -123,7 +123,10 @@ uv run python agent.py
 | Publish the catalogue site | [`docs/manuales/manual_despliegue.md`](docs/manuales/manual_despliegue.md) |
 | Something broke — what do I do? | [`docs/manuales/manual_resolucion_problemas.md`](docs/manuales/manual_resolucion_problemas.md) |
 
-> 🚧 Not written yet: the security manual and the risk register. Both are written by step 8 of the adoption, tracked in [`docs/adopcion_ingenieria.md`](docs/adopcion_ingenieria.md), which also records which core manuals deliberately do not apply here and why.
+| Know what is protected, and from whom | [`docs/manuales/manual_seguridad.md`](docs/manuales/manual_seguridad.md) — threat model and surface inventory |
+| See what is still open | [`docs/manuales/manual_riesgos.md`](docs/manuales/manual_riesgos.md) — the risk register |
+
+> Which core manuals deliberately do not apply to this repository, and why, is recorded in [`docs/adopcion_ingenieria.md`](docs/adopcion_ingenieria.md).
 
 ---
 

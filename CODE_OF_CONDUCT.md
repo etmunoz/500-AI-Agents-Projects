@@ -32,7 +32,14 @@ This Code of Conduct applies within all community spaces, and also applies when 
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at **ashishpatel.ce.2011@gmail.com**. All complaints will be reviewed and investigated promptly and fairly.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported privately to the maintainers of this repository, [**@etmunoz**](https://github.com/etmunoz), through a GitHub direct message. All complaints will be reviewed and investigated promptly and fairly.
+
+<!-- The upstream repository listed a maintainer email here. It was removed on
+     2026-09-11 rather than swapped: this fork diverged, and that address
+     belonged to someone no longer involved -- conduct reports were being
+     directed to an uninvolved third party. A direct email is a better channel
+     than a GitHub DM for this; add one here when there is an address this
+     project wants to publish. -->
 
 ## Attribution
 

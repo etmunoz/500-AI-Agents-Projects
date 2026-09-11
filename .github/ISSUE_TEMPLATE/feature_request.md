@@ -3,7 +3,7 @@ name: Add Agent / Feature Request
 about: Suggest a new agent implementation or use case to add
 title: '[AGENT] '
 labels: 'enhancement'
-assignees: 'ashishpatel26'
+assignees: 'etmunoz'
 ---
 
 ## Agent / Feature Summary

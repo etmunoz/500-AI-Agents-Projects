@@ -19,7 +19,7 @@ Al terminar esto vas a poder publicar el sitio desde un fork recién hecho, ente
 - Algo falló y querés el síntoma concreto → [`manual_resolucion_problemas.md`](manual_resolucion_problemas.md)
 - Cómo se ejecuta un agente → el `README.md` de ese agente, en `agents/<NN>-<nombre>/`
 - Por qué la arquitectura es así → [`docs/reglas/reglas_desarrollo.md`](../reglas/reglas_desarrollo.md) §3
-- El modelo de amenaza del despliegue → 🚧 todavía no existe; lo escribe el paso 8 de la adopción
+- El modelo de amenaza del despliegue → [`manual_seguridad.md`](manual_seguridad.md)
 
 ---
 
@@ -114,5 +114,5 @@ El workflow se dispara solo y republica. **No se edita `web/dist/` a mano**: es 
 | Algo falló y quiero el síntoma concreto | [`manual_resolucion_problemas.md`](manual_resolucion_problemas.md) |
 | ¿Cómo está construido y por qué así? | [`docs/reglas/reglas_desarrollo.md`](../reglas/reglas_desarrollo.md) |
 | ¿Qué es este repositorio y cómo empiezo? | [`README.md`](../../README.md) |
-| ¿Qué puede salir mal y qué sigue abierto? | 🚧 `manual_riesgos.md` — lo escribe el paso 8 de la adopción |
-| ¿Es seguro, y cómo se verifica? | 🚧 `manual_seguridad.md` — lo escribe el paso 8 |
+| ¿Qué puede salir mal y qué sigue abierto? | [`manual_riesgos.md`](manual_riesgos.md) |
+| ¿Es seguro, y cómo se verifica? | [`manual_seguridad.md`](manual_seguridad.md) |
