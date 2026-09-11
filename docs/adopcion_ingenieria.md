@@ -7,7 +7,7 @@ No aplican: contenedores · multiusuario · máquina compartida · escritorio ·
 
 > **Sobre el último**: el repositorio *sí* tiene una aplicación desplegable — `web/` es una SPA de React 18 + Vite 6 que el workflow `jekyll-gh-pages.yml` publica en GitHub Pages en cada push a `main`. Los pasos 6 (manuales) y 8 (seguridad) **aplican**, aunque acotados: el producto es un catálogo navegable más 21 agentes que se ejecutan en la máquina de quien los clona.
 
-**Herramientas de auditoría del repositorio central:** no se corrieron. `referencias_cruzadas.py` escribe seis archivos en `docs/referencias/` y su calibración es trabajo del paso 7. Ninguna cifra de este informe proviene de ellas: todo se midió con `git ls-files`, `git config`, `grep` y lectura directa.
+**Herramientas de auditoría del repositorio central:** no se corrieron **para el diagnóstico**. `referencias_cruzadas.py` escribe seis archivos en `docs/referencias/` y su calibración es trabajo del paso 7. Ninguna cifra de las secciones 0 a 6 de este informe proviene de ellas: todo se midió con `git ls-files`, `git config`, `grep` y lectura directa. **Se corrieron recién en el paso 7**, el 2026-09-11 — resultado en [`docs/revisiones/auditoria_codigo_20260911.md`](revisiones/auditoria_codigo_20260911.md).
 
 ---
 
@@ -470,6 +470,48 @@ Los pasos 0 a 6 se trabajaron en la rama `adopcion-ingenieria` y se integraron a
 
 ---
 
+## Paso 7 — Auditoría · 2026-09-11
+
+Reporte completo: [`docs/revisiones/auditoria_codigo_20260911.md`](revisiones/auditoria_codigo_20260911.md). Salida de la herramienta: [`docs/referencias/`](referencias/).
+
+**No se borró ni se editó una sola línea de código.** Auditar no es reparar.
+
+### La calibración, que era el trabajo
+
+| Corrida | Objetos | Aristas | Hallazgos |
+|---|---|---|---|
+| Sin configuración | 191 | 1193 | **35** |
+| Calibrada | **192** | **1204** | **11** |
+
+34 de los 35 primeros eran falsos positivos. Lo único declarado fueron los **26 puntos de entrada** — cada `agent.py` se ejecuta directamente y nadie lo importa, porque la autocontención es el diseño de §2.1.
+
+**La prueba de que no fue un falso verde:** los objetos **subieron**, no bajaron. Una calibración que reduce hallazgos reduciendo lo que se mira es exactamente lo que el paso advierte; ésta mira más y reporta menos. Y el conteo cierra contra la realidad: 27 módulos = los 27 `.py` versionados, 37 documentos = los 37 `.md`.
+
+### Resultado
+
+**1 hallazgo real, 10 falsos positivos confirmados.**
+
+El real: `agents/13-customer-support-agent/agent.py::route_after_escalation_check`, un router que nunca se cableó. Confianza **alta** — `grep` sobre todo el repositorio devuelve una sola línea, su propia definición. Severidad baja: el agente funciona igual, porque la bandera `escalate` sí afecta el prompt y la salida.
+
+Lo que lo hace valer la pena no es que esté muerto, sino lo que delata: su anotación dice `Literal["generate", "generate"]` —**el mismo destino dos veces**—, y el grafo usa una arista incondicional en vez de `add_conditional_edges`. Alguien escribió una bifurcación y quedó a medias, en un agente cuyo propósito declarado es *"routes complex issues to human escalation"*.
+
+Los 10 falsos: 9 de invocación por framework (`@mcp.tool()` y `_run` de `BaseTool`) y 1 defecto de la herramienta.
+
+### Lo que NO se miró, y hay que decirlo
+
+- **`web/` quedó fuera.** 1.579 líneas de React, con `App.jsx` en 1.057 — el archivo más grande del repositorio. `front_dirs` vacío **y declarado** en la configuración, porque la herramienta no tiene analizador para este stack.
+- **`.github/` no se indexó**, por el defecto de la herramienta.
+- **`auditoria_superficies.py` no se corrió:** requiere declarar excepciones de endpoints y roles, y este repositorio no tiene ni backend ni autenticación. Medir una superficie inexistente no es medir.
+- **`docs/referencias/mapa.yaml` no se creó**, y se declara **no aplicable**, no pendiente: un mapa contesta *"si cambio X, ¿qué más toco?"* y acá la respuesta estructural es "nada" — los agentes son autocontenidos y no se importan entre sí.
+- **Esto es análisis estático.** No prueba que ningún agente funcione. Siguen siendo cero pruebas.
+
+### Dos para el manual central (paso 9)
+
+1. **`referencias_cruzadas.py` reporta roto cualquier enlace a una carpeta que empiece con punto.** La línea 176 las salta al recorrer el árbol, así que su contenido nunca entra al índice. En cualquier repositorio con GitHub Actions esto es garantizado: `.github/workflows/` es justo lo que un README enlaza, y el falso hallazgo se ve idéntico a uno real.
+2. **La herramienta se cae si `--salida-dir` apunta fuera del repositorio** (`referencias_cruzadas.py:1339`, `ValueError` en `relative_to`) — y el **paso 0 instruye a usarla exactamente así** para no ensuciar el repositorio durante el diagnóstico.
+
+---
+
 ## Secuencia de adopción
 
 - [x] 0. Diagnóstico — 2026-09-11
@@ -479,6 +521,6 @@ Los pasos 0 a 6 se trabajaron en la rama `adopcion-ingenieria` y se integraron a
 - [x] 4. `/ingenieria:estructura` — 2026-09-11 · cero movimientos; `docs/roadmap.md` creada; carpetas ausentes declaradas
 - [x] 5. `/ingenieria:readme-proyecto` — 2026-09-11 · 7 de 13 referencias al upstream corregidas; índice, estado, alcance y pruebas agregados
 - [x] 6. `/ingenieria:manuales` — 2026-09-11 · 2 escritos, `SECURITY.md` partido, contrato de README de agente, 6 huecos declarados
-- [ ] 7. `/ingenieria:auditoria`
+- [x] 7. `/ingenieria:auditoria` — 2026-09-11 · 1 hallazgo real (alta confianza, severidad baja), 10 falsos positivos confirmados
 - [ ] 8. `/ingenieria:seguridad`
 - [ ] 9. `/ingenieria:cierre`

@@ -1,0 +1,68 @@
+# Configuracion de referencias_cruzadas.py para 500-AI-Agents-Projects.
+#
+# CALIBRADA el 2026-09-11 contra la primera corrida, que dio 35 hallazgos de
+# los cuales 34 eran falsos positivos. El detalle esta en
+# docs/revisiones/auditoria_codigo_20260911.md.
+#
+# La autodeteccion acierta las carpetas: 27 modulos y 37 documentos, que son
+# exactamente los .py y .md versionados. No se declaran python_dirs ni
+# doc_globs para no estrechar lo que mira.
+
+[scan]
+
+# web/ es React sin build de tipos que la herramienta entienda; se declara
+# vacio a proposito en vez de omitirlo, para que quede dicho que no se analiza.
+front_dirs = []
+front_globs = []
+
+excluir = [".git", ".venv", "venv", "node_modules", "__pycache__",
+           ".pytest_cache", ".ruff_cache", "dist", "build", "docs/referencias"]
+
+# TODO agent.py de este repositorio es un punto de entrada: se ejecuta con
+# `uv run python agent.py` desde su propia carpeta y nadie lo importa, porque
+# la autocontencion es el diseno declarado en reglas_desarrollo.md 2.1.
+#
+# Sin esta lista los 24 aparecen como huerfanos, que es el falso positivo mas
+# grande de la primera corrida. No se baja ningun umbral: se declara.
+entrypoints = [
+  "agents/01-web-research-agent/agent.py",
+  "agents/02-code-review-agent/agent.py",
+  "agents/03-pdf-qa-agent/agent.py",
+  "agents/04-sql-query-agent/agent.py",
+  "agents/05-email-drafting-agent/agent.py",
+  "agents/06-news-summarizer-agent/agent.py",
+  "agents/07-github-issue-triager/agent.py",
+  "agents/08-data-analysis-agent/agent.py",
+  "agents/09-resume-parser-agent/agent.py",
+  "agents/10-meeting-notes-agent/agent.py",
+  "agents/11-stock-research-agent/agent.py",
+  "agents/12-travel-planner-agent/agent.py",
+  "agents/13-customer-support-agent/agent.py",
+  "agents/14-social-media-agent/agent.py",
+  "agents/15-unit-test-generator/agent.py",
+  "agents/16-documentation-writer/agent.py",
+  "agents/17-recipe-agent/agent.py",
+  "agents/18-job-application-agent/agent.py",
+  "agents/19-competitive-analysis-agent/agent.py",
+  "agents/20-multi-agent-debate/agent.py",
+  "agents/21-pii-sanitization-agent/agent.py",
+  "crewai_mcp_course/lesson_01/agent.py",
+  "crewai_mcp_course/lesson_02/agent.py",
+  "crewai_mcp_course/lesson_03/agent.py",
+  "crewai_mcp_course/lesson_03/mcp_server.py",   # servidor MCP: se levanta con `uv run python mcp_server.py`
+  # El escaner de secretos lo invoca el hook pre-commit, no un import.
+  "herramientas/seguridad/revisar_secretos.py",
+]
+
+[recursos]
+patrones = ["read_text", "write_text", "read_bytes", "write_bytes",
+            "json.load", "json.dump", "open"]
+
+[api]
+backend = "none"    # ningun agente expone HTTP; el unico servidor es MCP
+frontend = "none"   # web/ es estatico y no llama a ninguna API propia
+llamadas_front = []
+ignore_endpoints = []
+
+[salida]
+dir = "docs/referencias"
