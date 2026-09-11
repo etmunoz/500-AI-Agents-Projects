@@ -116,8 +116,10 @@ python agent.py
 | Know what's measured, broken and pending | [`docs/adopcion_ingenieria.md`](docs/adopcion_ingenieria.md) |
 | Understand the CI checks | [`.github/workflows/`](.github/workflows/) — 6 workflows |
 | Enable the local git hooks | `git config core.hooksPath .githooks` — needed once per clone, it is not versioned |
+| Publish the catalogue site | [`docs/manuales/manual_despliegue.md`](docs/manuales/manual_despliegue.md) |
+| Something broke — what do I do? | [`docs/manuales/manual_resolucion_problemas.md`](docs/manuales/manual_resolucion_problemas.md) |
 
-> 🚧 Not written yet: the core manuals (`docs/manuales/`) and the threat model (`docs/riesgos.md`). Their status is tracked in [`docs/adopcion_ingenieria.md`](docs/adopcion_ingenieria.md).
+> 🚧 Not written yet: the security manual and the risk register. Both are written by step 8 of the adoption, tracked in [`docs/adopcion_ingenieria.md`](docs/adopcion_ingenieria.md), which also records which core manuals deliberately do not apply here and why.
 
 ---
 

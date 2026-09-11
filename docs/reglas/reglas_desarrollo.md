@@ -330,7 +330,8 @@ Un cambio no está terminado si la documentación que afecta sigue describiendo 
 >
 > El catálogo y los README de agentes no son documentación de apoyo: son **la superficie del sistema**. Estar desactualizado deja de ser "un documento viejo" y pasa a ser **una respuesta equivocada** para alguien que no nos puede preguntar.
 >
-> - Todo documento lleva **encabezado con audiencia y fecha de última revisión**. 🚧 Al 2026-09-11 **ninguno de los 30 `.md` lo tiene**; es deuda declarada del diagnóstico, no una regla ya cumplida.
+> - **El README de un agente es el manual de usuario de este proyecto.** No hay otro. Por eso sus secciones son un contrato con nombres exactos —`Setup`, `Run`, `Output`, `Cost`, `Limits`—, declarado en [`CONTRIBUTION.md`](../../CONTRIBUTION.md). Medición al 2026-09-11: los 21 existentes usan **12 formas distintas**; el contrato rige para los nuevos y para cualquiera que se toque por otro motivo.
+> - Todo documento lleva **encabezado con audiencia y fecha de última revisión**. 🚧 Al 2026-09-11 lo tienen los de `docs/`; **ninguno de los 26 `.md` de la raíz y de `agents/`**. Deuda declarada del diagnóstico, no una regla ya cumplida.
 > - Todo enlace tiene que resolver. El verificador de enlaces de CI **sólo mira `README.md`**: los 22 README de `agents/` se revisan a mano hasta que eso cambie.
 
 ---

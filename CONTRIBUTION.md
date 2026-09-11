@@ -28,12 +28,38 @@ Agents live in `agents/NN-agent-name/` where `NN` is the next free number. Copy 
 layout of an existing agent — `agents/01-web-research-agent/` is the reference. Exactly
 five files, nothing more:
 
-- `README.md` — what it does, quick start with exact commands, sample output, and rough runtime.
+- `README.md` — see the required sections below.
 - `agent.py` — the runnable entrypoint. Must run end-to-end in under 10 minutes.
   A notebook is fine instead if the demo is genuinely better that way.
 - `requirements.txt` — pin your versions. `pyproject.toml` or `environment.yml` also fine.
 - `.env.example` — every env var the agent needs, with placeholder values. Never a real key.
 - `metadata.yaml` — see the schema below.
+
+### What an agent README must contain
+
+**These READMEs are the user manual of this project.** There is no separate one — when
+somebody wants to know how to work your agent, this is the only thing they get. So the
+sections are a contract, not a suggestion, and they use these exact names:
+
+| Section | What goes in it |
+|---|---|
+| *(intro, no heading)* | One or two lines: what it does, which framework, which model, which external services. |
+| `## Setup` | The exact commands, in order, from `cd` into the folder to a ready environment. |
+| `## Run` | The default invocation, plus every flag with its default value. What runs when somebody types `python agent.py` with no arguments is what everybody does first. |
+| `## Output` | What the agent actually prints when it works. Paste a real run, trimmed — not a description of one. Use this exact heading; `Sample Output` and `Output includes` are older spellings being retired. |
+| `## Cost` | Which model, and roughly how many calls per run. The reader pays for this. |
+| `## Limits` | What it does not handle, what is not tested, known failure modes. Without it, a reader assumes anything unmentioned works. |
+
+Add `## Ethical considerations` as well if the agent touches people, personal data, or
+makes decisions about someone — and **if it sends data to a third party, say so in the
+first screen**, naming the destination. Whoever runs it has to be able to decide before,
+not find out by reading the source.
+
+> **Current state, measured 2026-09-11:** the 21 existing agent READMEs use **12
+> different shapes**. 20 of 21 have `Setup` and `Run`; past that there is no agreement,
+> and the same section appears as `Output`, `Sample Output` and `Output includes`. This
+> contract applies to new agents and to any README already being edited for another
+> reason. Nobody is rewriting all 21 at once.
 
 Everything here is MIT under the repository root `LICENSE`. If your agent pulls in code,
 models, or data under a different licence, say so in your README and link the source.
@@ -166,8 +192,17 @@ Short description of change
 ---
 
 ## Security, secrets & responsible disclosure
-- Never commit secrets, private keys, or API tokens.
-- If you discover a security vulnerability, do not open a public issue. Contact maintainers privately (see repository contact info) or use GitHub's private security advisory.
+
+**Writing or running agent code safely:**
+
+- **Never hardcode API keys** — always use `.env` files or environment variables.
+- **Never commit a `.env` file.** They are covered by [`.gitignore`](.gitignore), and a `pre-commit` hook scans staged changes for secrets — but the hook only protects a clone where it has been enabled (`git config core.hooksPath .githooks`, once per clone). Do not rely on it alone.
+- **Validate external inputs** before passing them to an LLM agent.
+- **Review tool permissions** — an agent that can execute code is dangerous if misconfigured. No agent in this repository uses `exec`, `eval`, `subprocess`, `os.system` or `shell=True` today, and that is a property we keep: adding one needs maintainer approval and a deterministic validation layer written in Python.
+- **Use least-privilege API keys** — restrict each key's scope to what the agent actually needs.
+- **Remember whose machine and whose money this runs on.** Anything merged here gets executed by strangers, against their own API credit. Declare an iteration ceiling on every agent loop.
+
+**Reporting a vulnerability:** do not open a public issue. The full policy — where to send it, what to include, and the response timeline — is in [`SECURITY.md`](SECURITY.md).
 
 ---
 

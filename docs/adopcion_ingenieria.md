@@ -282,6 +282,60 @@ Al correr `npm install` apareció `web/package-lock.json`, que **no estaba versi
 
 ---
 
+## Paso 6 — Manuales · 2026-09-11
+
+**El paso aplica.** El rasgo *sin aplicación desplegable* no corresponde: `web/` se publica a GitHub Pages y 21 agentes se ejecutan en máquinas ajenas. Pero aplica **acotado**: de los ocho del núcleo, dos se escribieron y seis no, cada uno con su motivo.
+
+### Corrección de un hallazgo del paso 5
+
+El paso 5 anotó que `CONTRIBUTION.md` duplicaba `SECURITY.md` y `CODE_OF_CONDUCT.md`. **Al leerlas, no las duplica:** son 3 y 2 líneas que remiten a los archivos dedicados sin restatear su contenido, que es exactamente lo que el estándar pide. Hallazgo retirado.
+
+**La duplicación real estaba en `SECURITY.md`**, y era de la otra clase: un archivo contestando **dos preguntas de dos audiencias**.
+
+### El mapeo contra el núcleo
+
+| Manual | Contesta | Veredicto |
+|---|---|---|
+| `manual_usuario.md` | ¿Cómo hago mi trabajo con esto? | **Ya existe, distribuido** — son los 21 `README.md` de agente. Un archivo único sería una copia peor y divergiría. El hueco real no era el manual: era que **no había contrato** de qué debe contener cada uno (ver abajo). |
+| `manual_administrador.md` | ¿Cómo lo configuro y opero día a día? | **No aplica.** No hay nada que administrar: sin servidor, sin cuentas, sin operación diaria. Lo único operativo —activar los hooks— está en el README y en las reglas §5. |
+| `manual_tecnico.md` | ¿Cómo está construido y por qué así? | **Ya existe** — `reglas_desarrollo.md` §2 (stack), §3 (arquitectura de módulos) y §3.1 (decisiones tomadas con su fecha y motivo). Escribirlo aparte sería la séptima copia divergente. |
+| `manual_integracion.md` | ¿Cómo hablo con él desde otro sistema? | **No aplica.** Nada expone una API, nada es importable, nada se publica en un registro de paquetes. |
+| `manual_despliegue.md` | ¿Cómo lo pongo en producción desde cero? | ✅ **Escrito** |
+| `manual_seguridad.md` | ¿Es seguro, y cómo se verifica? | 🚧 **Pendiente del paso 8**, que es quien lo escribe. No se inventa acá. |
+| `manual_riesgos.md` | ¿Qué puede salir mal y qué sigue abierto? | 🚧 **Pendiente del paso 8.** |
+| `manual_resolucion_problemas.md` | Algo falló, ¿qué hago? | ✅ **Escrito** |
+
+Condicionales: `manual_agentes.md` queda cubierto por el anexo E de las reglas, y `manual_datos_personales.md` por el bloque §9 más lo que escriba el paso 8. `manual_espacio.md` y `manual_migracion.md` no aplican (sin máquina compartida, sin portado).
+
+### Por qué dos y no ocho
+
+Los dos que se escribieron tienen **contenido medido, no inventado**:
+
+- **`manual_despliegue.md`** — nada documentaba que `web/` se publica a Pages, que un fork tiene que **habilitar Pages a mano** o el workflow falla recién en el último paso, que `concurrency: pages` encola en vez de pisar, que `base` está fijo al nombre del repositorio, ni que Vite hornea las `VITE_*` en tiempo de build.
+- **`manual_resolucion_problemas.md`** — es el hueco que el estándar reporta ausente en cinco de siete proyectos. Acá tiene 16 entradas con síntoma, causa y qué hacer, **todas medidas durante esta adopción**: el alias de Python de la Store, los hooks sin activar, el CRLF, el `venv` equivocado, el sitio en blanco por el `base`.
+
+Los otros seis no se escribieron. Un manual escrito para llenar una casilla es peor que su ausencia, porque además afirma.
+
+### El archivo que se partió
+
+`SECURITY.md` contestaba dos preguntas de dos audiencias: *"encontré una vulnerabilidad, ¿cómo la reporto?"* (investigador externo) y *"¿cómo escribo o corro un agente sin meter la pata?"* (colaborador). El segundo lector tenía que atravesar el primero para llegar a lo suyo.
+
+La mitad de buenas prácticas se movió a `CONTRIBUTION.md`, dentro de su sección de seguridad, que es donde un colaborador la busca. `SECURITY.md` quedó con una sola pregunta y un enlace al otro lado. Los enlaces se redirigieron en el mismo commit.
+
+Al moverlas se corrigieron dos afirmaciones: la de los `.env` "gitignored by default" ahora explica que el hook **sólo protege un clon donde fue activado**, y se agregó la propiedad de que ningún agente usa `exec`/`eval`/`subprocess` y que mantenerla requiere aprobación.
+
+### El hueco que no era un manual
+
+**Los 21 README de agente tienen 12 formas distintas.** 20 de 21 comparten `Setup` y `Run`; de ahí en adelante no hay acuerdo, y la misma sección aparece como `Output` (4 veces), `Sample Output` (2) y `Output includes` (2). El agente 21 no tiene ninguna de las dos.
+
+Como estos README **son** el manual de usuario, la brecha no era un manual faltante sino la falta de contrato. Se escribió en `CONTRIBUTION.md`: seis secciones con nombres exactos —`Setup`, `Run`, `Output`, `Cost`, `Limits` más la introducción—, con `Cost` y `Limits` como novedad. **No se reescribieron los 21**: el contrato rige para los nuevos y para cualquiera que se toque por otro motivo.
+
+### Lo que no se pudo medir
+
+`auditoria_manuales.py` —la herramienta que contesta *"de N manuales, cuántos cumplen X"* contra una línea base— **no se pudo correr: esta máquina no tiene Python**. Las cifras de este paso (12 formas, 20 de 21, 4/2/2) salen de `grep` y lectura directa, y se declaran así en vez de presentarse como salida de la herramienta. Revisar N manuales sin rubro fijo son N impresiones; estas tres cifras son mediciones, pero con un instrumento más pobre.
+
+---
+
 ## Secuencia de adopción
 
 - [x] 0. Diagnóstico — 2026-09-11
@@ -290,7 +344,7 @@ Al correr `npm install` apareció `web/package-lock.json`, que **no estaba versi
 - [x] 3. `/ingenieria:reglas` — 2026-09-11 · `docs/reglas/reglas_desarrollo.md`
 - [x] 4. `/ingenieria:estructura` — 2026-09-11 · cero movimientos; `docs/roadmap.md` creada; carpetas ausentes declaradas
 - [x] 5. `/ingenieria:readme-proyecto` — 2026-09-11 · 7 de 13 referencias al upstream corregidas; índice, estado, alcance y pruebas agregados
-- [ ] 6. `/ingenieria:manuales`
+- [x] 6. `/ingenieria:manuales` — 2026-09-11 · 2 escritos, `SECURITY.md` partido, contrato de README de agente, 6 huecos declarados
 - [ ] 7. `/ingenieria:auditoria`
 - [ ] 8. `/ingenieria:seguridad`
 - [ ] 9. `/ingenieria:cierre`

@@ -28,12 +28,8 @@ If you discover a security vulnerability in this repository or any of the agent 
 - Status update within **7 days**
 - Fix or mitigation within **30 days** (depending on severity)
 
-## Security Best Practices for Agent Implementations
+## Writing or running agent code safely
 
-When using or contributing agent code from this repo:
+That is a different question with a different reader, so it lives where a contributor will look for it: **[`CONTRIBUTION.md`](CONTRIBUTION.md#security-secrets--responsible-disclosure)**.
 
-- **Never hardcode API keys** — always use `.env` files or environment variables
-- **Never commit `.env` files** — they are gitignored by default
-- **Validate external inputs** before passing to LLM agents
-- **Review tool permissions** — agents with code execution can be dangerous if misconfigured
-- **Use least-privilege API keys** — restrict API key scopes to what the agent actually needs
+This file answers one question only: *I found a vulnerability — how do I report it?*

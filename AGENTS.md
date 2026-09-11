@@ -45,7 +45,8 @@ Peor: [`SECURITY.md`](SECURITY.md) afirma que los `.env` "are gitignored by defa
 | **Política de seguridad** | [`SECURITY.md`](SECURITY.md) · ⚠️ contiene una afirmación falsa, ver regla 1 |
 | **Estado de la adopción** — qué se midió y qué falta | [`docs/adopcion_ingenieria.md`](docs/adopcion_ingenieria.md) |
 | **Reglas de desarrollo** — stack, arquitectura, DoD | [`docs/reglas/reglas_desarrollo.md`](docs/reglas/reglas_desarrollo.md) |
-| **Manuales del núcleo** | `docs/manuales/` · 🚧 los crea el paso 6 |
+| **Cómo se despliega el catálogo web** | [`docs/manuales/manual_despliegue.md`](docs/manuales/manual_despliegue.md) |
+| **Algo falló, qué hago** | [`docs/manuales/manual_resolucion_problemas.md`](docs/manuales/manual_resolucion_problemas.md) |
 | **Modelo de amenaza y registro de riesgos** | `docs/riesgos.md` · 🚧 lo crea el paso 8 |
 
 ---
