@@ -8,7 +8,8 @@ Analyzes Python code and generates comprehensive pytest test suites — happy pa
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -16,13 +17,13 @@ cp .env.example .env
 
 ```bash
 # Generate tests for a Python file
-python agent.py --file my_module.py
+uv run python agent.py --file my_module.py
 
 # Generate tests for inline code
-python agent.py --code "def divide(a, b): return a / b"
+uv run python agent.py --code "def divide(a, b): return a / b"
 
 # Specify output file
-python agent.py --file utils.py --output tests/test_utils.py
+uv run python agent.py --file utils.py --output tests/test_utils.py
 ```
 
 ## Example

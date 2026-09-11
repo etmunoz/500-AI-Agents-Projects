@@ -374,6 +374,38 @@ ModuleNotFoundError: No module named 'comun'
 
 Es la primera vez que algo verifica el Python de este repositorio.
 
+### Migración a `uv` — y los dos defectos que destapó
+
+El PM extendió la decisión: **`uv` de punta a punta**, nada de `pip` al Python del sistema, entorno virtual por agente. Migrados el 2026-09-11 los 21 README de agente, `agents/README.md`, el del curso, `CONTRIBUTION.md`, el `README.md` raíz y §2.3/§7.1/§12 de las reglas.
+
+**Lo que la migración reveló del estado anterior:** los 21 README decían `pip install -r requirements.txt` **sin ningún paso de entorno virtual**. Seguido al pie de la letra, eso instala 24 manifiestos con versiones fijadas y en conflicto en el mismo Python del sistema. La autocontención que el proyecto promete existía en el árbol de archivos, no en las instrucciones.
+
+#### Defecto 1 — el agente de referencia no se podía instalar
+
+`agents/01-web-research-agent` fijaba `langchain-tavily==0.1.0`, **una versión que nunca se publicó** (la más antigua en PyPI es la 0.1.5), junto a `langchain-core==0.3.0`, demasiado viejo para cualquier `langchain-tavily` existente. El manifiesto era **internamente insatisfacible**: fallaba igual con `pip` y con `uv`.
+
+Es el agente que el `README.md` manda a correr primero y que `CONTRIBUTION.md` llama "la referencia". **Sobrevivió porque nada instala nada**: el CI no ejecuta Python y no hay pruebas.
+
+**Barrido completo, como exige §11.1:** los **104 pines** de los **24 manifiestos** contra la API de PyPI. Se verificó además que el parser reconociera las 104 líneas, para que "un solo defecto" no fuera un falso alivio. **Era el único.**
+
+Corregido al conjunto 0.3.x coherente que sí resuelve —`langchain==0.3.30`, `langchain-core==0.3.86`, `langchain-openai==0.2.14`, `langchain-tavily==0.1.6`, `langgraph==0.2.76`—. Se eligió quedarse en la línea 0.x a propósito: `uv` resolvía sin restricciones a `langchain 1.4.0`, un cambio de versión mayor que habría cambiado un fallo de instalación por uno de ejecución, porque el código está escrito contra la API 0.x.
+
+#### Defecto 2 — casi todos los agentes se caen en una consola Windows
+
+Con el agente ya instalable, la primera corrida murió en el primer `print`:
+
+```
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d'
+```
+
+Los agentes imprimen emoji y la consola de Windows usa cp1252. **Barrido: 23 de los 25 archivos Python contienen caracteres fuera de cp1252.** Con `PYTHONUTF8=1` el agente 01 pasó de caerse en el primer `print` a correr entero hasta la llamada al modelo, donde falló con un 401 por la clave de ejemplo — que es exactamente el criterio de aceptación de §7.1.
+
+No se corrigieron los 23 archivos: excede el alcance y es decisión del PM si los agentes dejan de imprimir emoji o si el proyecto declara `PYTHONUTF8=1` como requisito. Queda en el manual de resolución de problemas con su paliativo, y como deuda declarada.
+
+#### Lo que los dos tienen en común
+
+Ninguno es un error sutil: **el agente insignia no se instalaba y casi ningún agente arrancaba en Windows.** Los dos llevaban ahí desde antes del fork y ninguno se había notado, porque **nada de este repositorio se ejecuta nunca** — el CI valida markdown, enlaces y sign-off. Es el hallazgo 3 del diagnóstico dejando de ser abstracto.
+
 ### Candidato a subir al manual central (paso 9)
 
 **Un escáner de seguridad que se cae no debería informar "encontró un secreto".** Frenar el commit está bien —fallar cerrado es lo correcto en un hook de seguridad—, pero el mensaje tiene que distinguir *"encontré esto"* de *"no pude mirar"*. El hook ya tiene ese vocabulario en el `pre-push`, donde un chequeo que no puede correr sale con `2 = NO SÉ`; el `pre-commit` no lo aplica a la caída de un motor. Un mensaje que atribuye un hallazgo inexistente manda a buscar un secreto que no existe.

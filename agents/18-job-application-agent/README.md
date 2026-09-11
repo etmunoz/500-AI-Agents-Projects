@@ -8,7 +8,8 @@ CrewAI agent that generates a complete job application package: cover letter, ta
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -16,10 +17,10 @@ cp .env.example .env
 
 ```bash
 # Uses built-in sample
-python agent.py
+uv run python agent.py
 
 # Your own job + profile
-python agent.py \
+uv run python agent.py \
   --job-desc "$(cat job_posting.txt)" \
   --candidate "$(cat my_profile.txt)"
 ```

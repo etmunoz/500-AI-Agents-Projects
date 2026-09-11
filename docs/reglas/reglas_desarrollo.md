@@ -91,14 +91,26 @@ Sin esto, dos documentos que se contradicen se resuelven por quien lo leyó últ
 
 **El estilo de Python se valida por revisión manual. Es un hueco declarado, no un olvido.** Ningún workflow ejecuta Python: el CI valida markdown, enlaces y sign-off, y nada más. Ver §6.
 
-### 2.3. El intérprete de Python se obtiene con `uv`
+### 2.3. Python se maneja con `uv`, de punta a punta
 
-Decisión del PM, 2026-09-11. `uv` instala y administra los intérpretes; **no reemplaza** a `pip` ni a `requirements.txt` dentro de cada agente, que siguen siendo el contrato público de §2.1.
+Decisión del PM, 2026-09-11. `uv` es el gestor de entorno declarado del proyecto: obtiene el intérprete, crea el entorno virtual e instala las dependencias. **`requirements.txt` sigue siendo el manifiesto** (§2.1) — lo que cambia es quién lo lee.
+
+**Nunca se instala con `pip` al Python del sistema.** Todo agente se instala dentro de su propio `.venv`, y esa es la regla que hace cierta la autocontención de §2.1: sin entorno por agente, `crewai==0.80.0` y `langchain==0.3.0` terminan en el mismo sitio.
 
 ```bash
-uv python install                    # instala un intérprete administrado por uv
-uv python list                       # muestra los que hay y dónde están
+# Una vez por máquina
+uv python install
+uv python list                                       # ver dónde quedó
+git config --local ingenieria.python "<esa ruta>"    # declararlo, por clon
+
+# Por agente
+cd agents/<NN>-<nombre>
+uv venv                                              # crea .venv/ acá
+uv pip install -r requirements.txt
+uv run python agent.py                               # usa .venv/ solo, sin activar
 ```
+
+`uv run` resuelve el entorno local automáticamente: no hay paso de activación que olvidar, ni forma de instalar las dependencias de un agente en el entorno de otro.
 
 **Y después hay que declararlo, una vez por clon**, o las herramientas del repositorio no lo encuentran:
 
@@ -110,7 +122,11 @@ Va en `--local` porque la ruta es de tu máquina: vive en `.git/config`, que no 
 
 **Por qué hace falta declararlo y no alcanza con el PATH.** En Windows, `python` y `python3` están en el PATH como alias de la Microsoft Store que **fallan al ejecutarse**. Están antes que cualquier otra cosa, así que un intérprete instalado después no gana. Verificado el 2026-09-11 con uv ya instalado: `command -v python3` lo sigue encontrando y `python3 -c ""` sigue fallando. Ver §11.2.
 
-**Los agentes conservan `pip` y `venv` en su documentación pública.** Los 21 README y `CONTRIBUTION.md` documentan `pip install -r requirements.txt`, y eso **no cambia**: quien clona un agente no tiene por qué tener `uv`. La decisión de arriba gobierna las herramientas *de este repositorio* —los hooks, la comprobación de sintaxis, los scripts de auditoría—, no el contrato con quien usa un agente.
+**Esto rige también para la documentación pública.** Los 21 README de agente, el del curso y `CONTRIBUTION.md` documentan `uv venv` + `uv pip install` + `uv run python`, no `pip install`. Migrados el 2026-09-11.
+
+**Por qué se documenta así y no con `pip` a secas:** los 21 README decían `pip install -r requirements.txt` **sin ningún paso de entorno virtual**. Al pie de la letra, eso instala 24 manifiestos con versiones fijadas y en conflicto —`crewai==0.80.0` junto a `langchain==0.3.0`— en el mismo Python del sistema. La autocontención que el proyecto promete existía en el árbol de archivos y no en las instrucciones.
+
+**Verificación de versiones antes de fijar.** Toda versión nueva que entre a un `requirements.txt` tiene que existir en PyPI **y resolver junto con las demás del archivo**. No alcanza con que el paquete exista: ver §11.2, donde un manifiesto fijaba una versión que nunca se publicó.
 
 
 ---
@@ -265,7 +281,13 @@ El error caro no es equivocarse: es **afirmar más de lo que se midió**.
   rm -rf web/node_modules web/dist && npm --prefix web install && npm --prefix web run build
   ```
 
-- **Criterio de aceptación de un agente:** en una carpeta limpia, `python -m venv .venv && pip install -r requirements.txt && cp .env.example .env && python agent.py` tiene que llegar hasta el mensaje de "falta la clave" sin ningún otro error.
+- **Criterio de aceptación de un agente:** en la carpeta del agente, sin `.venv` previo,
+
+  ```bash
+  uv venv --clear && uv pip install -r requirements.txt && cp .env.example .env && uv run python agent.py
+  ```
+
+  tiene que llegar hasta el mensaje de "falta la clave" sin ningún otro error. **El paso de instalación es parte del criterio, no un preámbulo**: es exactamente el que estuvo fallando sin que nadie lo notara en el agente 01 (§11.2).
 - Todo artefacto derivado es **regenerable desde su fuente**, no se corrige a mano. `images/star-history.svg` lo produce `scripts/star-history.mjs`: editarlo a mano lo pisa el workflow en el próximo lunes.
 
 ---
@@ -386,6 +408,7 @@ Cuando algo hace perder tiempo, **no basta con arreglarlo**. Antes de cerrar el 
 | **CRLF en scripts POSIX** | `bad interpreter` en Linux y macOS; en Windows no pasa nada | `core.autocrlf=true` a nivel **sistema** en Git para Windows. Sin `.gitattributes`, cada clon decide solo. MSYS tolera el `\r`, que es peor: en Windows parece que funciona | [`.gitattributes`](../../.gitattributes) con `eol=lf` explícito en `.githooks/*` y `*.sh` |
 | **`command -v python` encuentra un Python que no existe** | La comprobación de secretos informaba "no corrió" en vez de fallar, o peor, un chequeo salía verde sin haber corrido | En Windows, `python` y `python3` están en el PATH como **alias de la Microsoft Store** que fallan al ejecutarse. `command -v` los encuentra y los da por buenos. **Instalar Python no lo arregla:** los alias siguen antes en el PATH. Verificado el 2026-09-11 con `uv` ya instalado y 3.13.13 funcionando — `command -v python3` seguía encontrando el alias y `python3 -c ""` seguía fallando | El intérprete se **prueba** con `-c ""`, no se pregunta si está; y se **declara por ruta** con `git config --local ingenieria.python` en vez de confiar en el PATH (§2.3). Toda comprobación que no puede correr sale con **2 = NO SÉ**, nunca con 0 |
 | **El README manda a clonar otro repositorio** | Quien sigue el Quick Start al pie de la letra termina en el fork de otra persona; quien reporta una vulnerabilidad —o una conducta— la manda al correo de otra persona | Fork de `ashishpatel26` con **13 referencias al original intactas en 6 archivos** | 🚧 Todavía ninguno. Se reescriben en los pasos 5 y 8. Hasta entonces, la regla de §1 |
+| **El agente de referencia no se podía instalar, y nadie lo sabía** | `agents/01-web-research-agent` —el primero que el README manda a correr y el que `CONTRIBUTION.md` llama "la referencia"— fallaba al instalar con un error de resolución, con `pip` y con `uv` por igual | `requirements.txt` fijaba `langchain-tavily==0.1.0`, **una versión que nunca se publicó**: la más antigua en PyPI es la 0.1.5. Y `langchain-core==0.3.0` era a su vez demasiado viejo para cualquier `langchain-tavily` existente, así que el manifiesto era **internamente insatisfacible**. Sobrevivió porque **nada instala nada**: el CI no ejecuta Python y no hay pruebas | Barrido de los 104 pines de los 24 manifiestos contra la API de PyPI, 2026-09-11 — este era el único. Regla nueva en §2.3: una versión no se fija sin comprobar que existe **y que resuelve con las demás del archivo**. El mecanismo que falta es un chequeo de instalación en CI, y está declarado como deuda en §6 |
 | **Contar con un `grep` demasiado estrecho** | El informe del paso 0 afirmó "nueve referencias al upstream en cuatro archivos". El número real es **13 en 6** | El `grep` sólo miraba `*.md` y sólo el patrón `ashishpatel26`. Se le escaparon el correo del mantenedor original (`ashishpatel.ce.2011@`) en dos archivos, y una regla en un `.yml`. **Una cifra medida con el filtro equivocado se ve exactamente igual que una bien medida** | Todo inventario que vaya a un documento se escribe con el comando que lo produjo al lado, y el comando cubre **todas** las extensiones y **todos** los patrones del concepto, no el más obvio. Ver §7 |
 
 ---
@@ -404,12 +427,15 @@ git config --local ingenieria.python "<esa ruta>"    #    y declararlo
 # Comprobar que el intérprete declarado REALMENTE ejecuta
 "$(git config --get ingenieria.python)" -c "" && echo ok
 
-# Correr un agente
+# Correr un agente — nunca se instala al Python del sistema
 cd agents/01-web-research-agent
-python -m venv .venv && source .venv/Scripts/activate   # .venv/bin/activate en Linux/macOS
-pip install -r requirements.txt
-cp .env.example .env        # y poner la clave
-python agent.py
+uv venv                          # crea .venv/ acá, sólo para este agente
+uv pip install -r requirements.txt
+cp .env.example .env             # y poner la clave
+uv run python agent.py           # usa .venv/ sin activarlo
+
+# Rehacer el entorno de un agente desde cero
+uv venv --clear && uv pip install -r requirements.txt
 
 # Sintaxis de los 25 archivos Python, sin instalar dependencias
 "$(git config --get ingenieria.python)" -m compileall -q agents crewai_mcp_course

@@ -31,7 +31,7 @@ five files, nothing more:
 - `README.md` — see the required sections below.
 - `agent.py` — the runnable entrypoint. Must run end-to-end in under 10 minutes.
   A notebook is fine instead if the demo is genuinely better that way.
-- `requirements.txt` — pin your versions. `pyproject.toml` or `environment.yml` also fine.
+- `requirements.txt` — pin your versions, and **check each pin actually exists on PyPI and resolves alongside the others**. See the note below.
 - `.env.example` — every env var the agent needs, with placeholder values. Never a real key.
 - `metadata.yaml` — see the schema below.
 
@@ -44,8 +44,8 @@ sections are a contract, not a suggestion, and they use these exact names:
 | Section | What goes in it |
 |---|---|
 | *(intro, no heading)* | One or two lines: what it does, which framework, which model, which external services. |
-| `## Setup` | The exact commands, in order, from `cd` into the folder to a ready environment. |
-| `## Run` | The default invocation, plus every flag with its default value. What runs when somebody types `python agent.py` with no arguments is what everybody does first. |
+| `## Setup` | The exact commands, in order, from `cd` into the folder to a ready environment: `uv venv`, then `uv pip install -r requirements.txt`, then `cp .env.example .env`. |
+| `## Run` | The default invocation — `uv run python agent.py` — plus every flag with its default value. What runs with no arguments is what everybody does first. |
 | `## Output` | What the agent actually prints when it works. Paste a real run, trimmed — not a description of one. Use this exact heading; `Sample Output` and `Output includes` are older spellings being retired. |
 | `## Cost` | Which model, and roughly how many calls per run. The reader pays for this. |
 | `## Limits` | What it does not handle, what is not tested, known failure modes. Without it, a reader assumes anything unmentioned works. |
@@ -60,6 +60,38 @@ not find out by reading the source.
 > and the same section appears as `Output`, `Sample Output` and `Output includes`. This
 > contract applies to new agents and to any README already being edited for another
 > reason. Nobody is rewriting all 21 at once.
+
+### Environment: use `uv`, never install into system Python
+
+Agents are installed with [`uv`](https://github.com/astral-sh/uv), each into its own
+`.venv` inside its own folder:
+
+```bash
+cd agents/NN-your-agent
+uv venv
+uv pip install -r requirements.txt
+uv run python agent.py
+```
+
+`uv run` picks up the local `.venv` with no activation step. This is what makes the
+"self-contained agent" promise real: without a per-agent environment, `crewai==0.80.0`
+and `langchain==0.3.0` end up in the same place and fight.
+
+### Verify your pins before you commit them
+
+**A pinned version has to exist on PyPI and resolve alongside the others in the file.**
+Run the install in a clean environment and watch it succeed:
+
+```bash
+uv venv --clear && uv pip install -r requirements.txt
+```
+
+> This is not hypothetical. On 2026-09-11 a sweep of all 104 pins across the 24
+> manifests found that `agents/01-web-research-agent` — the reference agent, the first
+> one the README tells you to run — **could not be installed by anyone**. It pinned
+> `langchain-tavily==0.1.0`, a version that was never published, alongside a
+> `langchain-core` too old for any version that was. It went unnoticed because nothing
+> in CI installs anything.
 
 Everything here is MIT under the repository root `LICENSE`. If your agent pulls in code,
 models, or data under a different licence, say so in your README and link the source.
@@ -180,8 +212,8 @@ Suggested minimal PR template (add to .github/PULL_REQUEST_TEMPLATE.md if helpfu
 Short description of change
 
 ## How to run
-1. pip install -r requirements.txt
-2. python run_demo.py
+1. uv venv && uv pip install -r requirements.txt
+2. uv run python agent.py
 
 ## Checklist
 - [ ] README updated

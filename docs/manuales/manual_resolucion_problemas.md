@@ -40,6 +40,25 @@ cp .env.example .env
 
 y poné la clave adentro. `.env.example` lista exactamente qué variables necesita ese agente — no son las mismas para todos: el 01 necesita también `TAVILY_API_KEY`, el 06 `NEWS_API_KEY`, el 07 `GITHUB_TOKEN`.
 
+### `UnicodeEncodeError: 'charmap' codec can't encode character`
+
+**Síntoma:** el agente arranca y muere en el primer `print`, con un traceback que termina en `cp1252.py`. Pasa **antes** de hacer nada útil.
+
+**Causa:** los agentes imprimen emoji, y la consola de Windows usa cp1252 por defecto. No es un problema del agente: es el códec de salida.
+
+**Alcance medido el 2026-09-11: 23 de los 25 archivos Python del repositorio contienen caracteres fuera de cp1252.** En la práctica, casi todos los agentes se caen en una consola Windows recién abierta, con Python ≤3.14.
+
+**Qué hacer:** forzar UTF-8 en la salida.
+
+```bash
+PYTHONUTF8=1 uv run python agent.py          # una corrida
+export PYTHONUTF8=1                          # toda la sesión
+```
+
+Verificado: el agente 01 pasaba de caerse en el primer `print` a **correr entero** hasta la llamada al modelo.
+
+> Python 3.15 activa el modo UTF-8 por defecto (PEP 686), así que esto desaparece solo al subir de versión. En Linux y macOS no ocurre.
+
 ### `ModuleNotFoundError` con un paquete que jurás haber instalado
 
 **Síntoma:** `No module named 'langchain'` justo después de un `pip install` exitoso.
@@ -54,6 +73,16 @@ python -c "import sys; print(sys.prefix)"
 ```
 
 Si `sys.prefix` no apunta al `.venv` de **esa** carpeta, activá el correcto antes de diagnosticar nada más.
+
+### `No solution found when resolving dependencies`
+
+**Síntoma:** `uv pip install -r requirements.txt` se niega a resolver. Con `pip` el error es distinto pero el resultado es el mismo.
+
+**Causa:** el manifiesto fija una versión que **no existe**, o un conjunto que no puede coexistir. Leé el mensaje de `uv`: nombra el paquete y el conflicto exacto.
+
+**Qué hacer:** comprobá si la versión existe realmente en PyPI —`https://pypi.org/pypi/<paquete>/json` lista todas— y si el problema es otro pin del mismo archivo.
+
+> **Ya pasó, en el agente de referencia.** `agents/01-web-research-agent` fijaba `langchain-tavily==0.1.0`, una versión **que nunca se publicó** (la más antigua es 0.1.5), junto a un `langchain-core==0.3.0` demasiado viejo para cualquiera de las que sí existen. El agente que el README manda a correr primero **no se podía instalar**, y sobrevivió así porque nada en CI instala nada. Corregido el 2026-09-11 al conjunto 0.3.x coherente que resuelve.
 
 ### Un agente que funcionaba dejó de funcionar sin que nadie lo tocara
 

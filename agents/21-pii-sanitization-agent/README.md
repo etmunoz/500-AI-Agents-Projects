@@ -24,8 +24,9 @@ This agent is the guardrail: sanitize first, then send.
 ## Quick start
 
 ```bash
-pip install -r requirements.txt
-python agent.py --text "Call me at 555-123-4567, email a@b.com, RFC PEMJ880126MNEZSN01"
+uv venv
+uv pip install -r requirements.txt
+uv run python agent.py --text "Call me at 555-123-4567, email a@b.com, RFC PEMJ880126MNEZSN01"
 ```
 
 With no API key it uses the **free trial** (50 sanitizations, `tx_hash=TRIAL`).
@@ -33,13 +34,13 @@ For higher volume, pay once via x402 and pass the Solana tx hash:
 
 ```bash
 export TRUSTBOOST_WALLET="<your-agent-wallet>"
-python agent.py --text "..." --tx-hash "<solana_tx_hash>"
+uv run python agent.py --text "..." --tx-hash "<solana_tx_hash>"
 ```
 
 Sanitize a file:
 
 ```bash
-python agent.py --file input.txt --context legal
+uv run python agent.py --file input.txt --context legal
 ```
 
 Context modes: `general | financial | legal | medical | code`.

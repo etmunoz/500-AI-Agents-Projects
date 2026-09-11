@@ -8,7 +8,8 @@ Automatically triages GitHub issues: assigns severity, category, labels, and rou
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -16,10 +17,10 @@ cp .env.example .env
 
 ```bash
 # From a GitHub URL
-python agent.py --issue-url https://github.com/owner/repo/issues/123
+uv run python agent.py --issue-url https://github.com/owner/repo/issues/123
 
 # From title + body text
-python agent.py --title "App crashes on login" --body "Steps: 1. Open app 2. Click login 3. App crashes"
+uv run python agent.py --title "App crashes on login" --body "Steps: 1. Open app 2. Click login 3. App crashes"
 ```
 
 ## Output

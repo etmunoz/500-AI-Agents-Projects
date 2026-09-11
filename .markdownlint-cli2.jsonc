@@ -3,6 +3,13 @@
   // internal notes are left alone on purpose.
   "globs": ["README.md", "CONTRIBUTION.md", "SECURITY.md", "CODE_OF_CONDUCT.md", "agents/**/*.md"],
 
+  // Third-party markdown that happens to sit under a globbed path. `agents/**`
+  // matches the .venv/ an agent's own documented setup creates, and then the
+  // linter reports defects in somebody else's licence file. CI never sees this
+  // -- it does not install anything -- so without this the check is green in CI
+  // and red for every contributor who followed the README.
+  "ignores": ["**/.venv/**", "**/node_modules/**", "**/__pycache__/**"],
+
   "config": {
     // Cosmetic rules are off on purpose - this repo is tables and badges, and
     // reformatting 400 lines to satisfy a linter buys nothing.

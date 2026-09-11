@@ -8,7 +8,8 @@ Converts meeting transcripts into structured notes with summary, action items, d
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -16,16 +17,16 @@ cp .env.example .env
 
 ```bash
 # Use built-in sample transcript
-python agent.py
+uv run python agent.py
 
 # Your own transcript file
-python agent.py --transcript meeting_transcript.txt
+uv run python agent.py --transcript meeting_transcript.txt
 
 # Inline text
-python agent.py --text "Alice: Let's ship by Friday. Bob: I need 2 more days for testing..."
+uv run python agent.py --text "Alice: Let's ship by Friday. Bob: I need 2 more days for testing..."
 
 # Custom output path
-python agent.py --transcript meeting_transcript.txt --output sprint_notes.md
+uv run python agent.py --transcript meeting_transcript.txt --output sprint_notes.md
 ```
 
 ## Output

@@ -8,7 +8,8 @@ A CrewAI two-agent system that drafts professional emails. An analyst agent extr
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -16,10 +17,10 @@ cp .env.example .env
 
 ```bash
 # Default example
-python agent.py
+uv run python agent.py
 
 # Custom email
-python agent.py \
+uv run python agent.py \
   --context "Apologize for the delayed delivery of the software project" \
   --tone "apologetic but confident" \
   --recipient "the client project manager"

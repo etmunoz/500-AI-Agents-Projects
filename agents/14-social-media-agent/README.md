@@ -8,13 +8,14 @@ Generates platform-optimized social media content (Twitter/X, LinkedIn, Instagra
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
 ## Run
 
 ```bash
-python agent.py --topic "The future of remote work"
-python agent.py --topic "Product launch announcement" --brand "YourBrand" --platforms "twitter,linkedin"
+uv run python agent.py --topic "The future of remote work"
+uv run python agent.py --topic "Product launch announcement" --brand "YourBrand" --platforms "twitter,linkedin"
 ```

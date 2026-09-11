@@ -8,7 +8,8 @@ Loads any PDF and lets you ask questions about it. Supports both single-question
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -16,10 +17,10 @@ cp .env.example .env
 
 ```bash
 # Interactive Q&A (recommended)
-python agent.py --pdf your_document.pdf
+uv run python agent.py --pdf your_document.pdf
 
 # Single question
-python agent.py --pdf research_paper.pdf --question "What methodology was used?"
+uv run python agent.py --pdf research_paper.pdf --question "What methodology was used?"
 ```
 
 ## Use cases

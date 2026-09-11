@@ -15,7 +15,8 @@ A LangGraph agent that searches the web for any topic and synthesizes a structur
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 # Edit .env and add your API keys
 ```
@@ -28,10 +29,10 @@ Get free API keys:
 
 ```bash
 # Default query
-python agent.py
+uv run python agent.py
 
 # Custom query
-python agent.py --query "latest advances in quantum computing"
+uv run python agent.py --query "latest advances in quantum computing"
 ```
 
 ## Sample Output

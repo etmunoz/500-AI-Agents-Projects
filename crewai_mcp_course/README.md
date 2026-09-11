@@ -58,9 +58,9 @@ graph TD
 
 1. Install the required packages for the lesson you want to run:
 ```bash
-pip install -r lesson_01/requirements.txt
-pip install -r lesson_02/requirements.txt
-pip install -r lesson_03/requirements.txt
+uv pip install -r lesson_01/requirements.txt
+uv pip install -r lesson_02/requirements.txt
+uv pip install -r lesson_03/requirements.txt
 ```
 
 2. Set up your environment variables:

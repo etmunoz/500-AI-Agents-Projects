@@ -70,13 +70,17 @@ npm --prefix web run dev
 
 ### Run an agent — needs your own API key
 
+Agents use [**uv**](https://github.com/astral-sh/uv). Install it once ([instructions](https://docs.astral.sh/uv/getting-started/installation/)), and it handles the Python interpreter and the virtual environment for you — you never install into your system Python.
+
 ```bash
 cd agents/01-web-research-agent
-python -m venv .venv && source .venv/bin/activate   # .venv/Scripts/activate on Windows
-pip install -r requirements.txt
-cp .env.example .env        # then put your key in it
-python agent.py
+uv venv                              # creates .venv/ here, for this agent only
+uv pip install -r requirements.txt
+cp .env.example .env                 # then put your key in it
+uv run python agent.py
 ```
+
+`uv run` uses the local `.venv` automatically — no activation step, and no chance of installing one agent's dependencies into another's environment.
 
 **What you'll see:** the agent prints each step as it goes — the query it received, the searches it ran, the sources it found, and the report it assembled. If the key is missing it says so and stops; that is the expected first run.
 
