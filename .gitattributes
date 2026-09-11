@@ -1,0 +1,41 @@
+# Normalizar a LF dentro del repositorio. Al 2026-09-11 los 145 archivos de
+# texto versionados ya estan en LF, asi que esto no renormaliza nada: fija el
+# estado actual para que no dependa de la maquina de quien clone.
+#
+# Por que hace falta: `core.autocrlf` esta en `true` a nivel SISTEMA en Git
+# para Windows, y sin este archivo cada clon decide solo. Se nota ya:
+# `scripts/star-history.mjs` llega al arbol de trabajo con CRLF.
+* text=auto
+
+# --- Scripts POSIX: LF SIEMPRE, tambien en el arbol de trabajo --------------
+# Un hook con CRLF falla con "bad interpreter" en Linux y macOS, y entonces el
+# repositorio queda sin proteccion de secretos sin que nada lo avise. MSYS lo
+# tolera, que es peor: en Windows parece que funciona.
+.githooks/* text eol=lf
+*.sh        text eol=lf
+
+# --- Codigo: LF ------------------------------------------------------------
+*.py   text eol=lf
+*.mjs  text eol=lf
+*.js   text eol=lf
+*.jsx  text eol=lf
+*.json text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.md   text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+
+# --- El SVG lo genera y commitea el workflow star-history.yml --------------
+# Sin eol=lf, un colaborador en Windows produciria un diff completo del archivo
+# en cada regeneracion.
+*.svg text eol=lf
+
+# --- Binarios: que git no los toque ----------------------------------------
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary

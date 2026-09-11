@@ -80,11 +80,56 @@ Es lo único que el repositorio despliega, y no aparece en el README, ni en la g
 
 ---
 
+## Paso 2 — Higiene · 2026-09-11
+
+### Lo que se buscó y no apareció
+
+**No hay secretos, ni en el árbol trackeado ni en el historial completo.** Se escaneó `git log --all -p` contra los patrones de OpenAI, GitHub (clásico y fine-grained), AWS, Google, Slack y bloques de clave privada PEM. La única coincidencia es `sk-abc123fakekeynotreal0000000000`, declarada explícitamente como fixture falsa en el agente 21. **No hay nada que rotar.**
+
+Los 24 `.env.example` traen solo marcadores (`your_openai_api_key_here` y equivalentes). Ningún `.env` real existió jamás en el historial. Cero artefactos generados versionados: sin `dist/`, sin `node_modules/`, sin `__pycache__`, sin `.sqlite`.
+
+`images/star-history.svg` **sí** es un archivo generado y versionado, pero a propósito: lo produce y commitea el workflow `star-history.yml`, que para eso tiene `contents: write`. No se ignora.
+
+`scripts/star-history.mjs` tiene consumidor real —dos invocaciones en ese mismo workflow—, así que no es un script huérfano. No queda nada anotado para el paso 7 por este motivo.
+
+### Lo que se instaló
+
+**`.gitignore`** — no existía ninguno. Patrones anclados a rutas exactas: `/web/node_modules/` en vez de `node_modules/` suelto, y las cinco salidas de agentes por su ruta completa (`/agents/04-sql-query-agent/demo.sqlite` y compañía) en vez de `*.csv` o `*.sqlite` globales, que esconderían contenido real.
+
+Decisión deliberada de **no** ignorar `test_*.py`, que es lo que genera el agente 15 en su carpeta: el patrón escondería las pruebas reales el día que el repositorio tenga alguna. Excluir de más se ve idéntico a estar bien configurado, y es el riesgo que este paso advierte.
+
+**Hooks** en `.githooks/`, con `core.hooksPath` apuntando ahí: `pre-commit` (secretos) y `pre-push` (comprobaciones), más `.githooks/comprobaciones` con los comandos reales de este proyecto.
+
+**`scripts/revisar_secretos.py`** — el segundo motor del hook, en una de las rutas donde `pre-commit` lo busca por convención.
+
+### Verificación — ejecutando, no leyendo
+
+| Qué se probó | Resultado |
+|---|---|
+| Hook contra un secreto **inventado** (no uno de ejemplo de proveedor) | 🔴 **Frenó el commit** — `leaks found: 2`, HEAD sin moverse |
+| Hook contra archivos limpios | 🟢 Pasó, y avisó que `revisor-local` no corrió |
+| `git ls-files -i -c` — ¿algún archivo ya versionado quedó ignorado? | Ninguno |
+| Clon limpio vs. árbol trackeado | Idénticos: 148 archivos, los 24 `.env.example` presentes |
+| `pre-push` → markdown | 🟢 0 — 26 archivos, 0 hallazgos |
+| `pre-push` → agentes (sintaxis) | 🟡 **2 = NO SÉ** — no hay Python en esta máquina |
+| `pre-push` → web (build) | 🟡 **2 = NO SÉ** — falta `npm install` en `web/` |
+
+> El clon limpio verificó el estado commiteado, que todavía no incluye el `.gitignore`. La conclusión se sostiene igual porque `git ls-files -i -c` ya probó que ningún archivo versionado queda excluido por los patrones nuevos.
+
+### Lo que queda abierto
+
+1. **Un solo motor de secretos activo.** `gitleaks` corre (Docker 28.5.1 con el demonio arriba); `revisar_secretos.py` **no**, porque en esta máquina Python es solo el alias de la Microsoft Store — está en el PATH y falla al ejecutarse, que es exactamente el falso positivo contra el que el hook se blinda probando el intérprete con `-c ""`. Si Docker está apagado, `pre-commit` responde "no sé" y **deja pasar**. Al instalar Python: `git config --local ingenieria.python <ruta>`.
+2. **`core.hooksPath` es configuración local**, vive en `.git/config` y no se versiona. Cada clon nuevo tiene que correr `git config core.hooksPath .githooks` o queda sin protección. Hay que documentarlo en el paso 3 (reglas) y en el paso 5 (README).
+3. ~~No hay `.gitattributes`.~~ **Resuelto** — el PM lo aprobó y entró en el mismo commit del paso 2. Motivo: `core.autocrlf` está en `true` **a nivel sistema** en Git para Windows, y sin `.gitattributes` cada clon decide solo el fin de línea. Ya se notaba: `scripts/star-history.mjs` llega al árbol de trabajo con CRLF. Lo grave no era el ruido en los diffs sino `.githooks/*`: un hook con CRLF falla con `bad interpreter` en Linux y macOS, y el repositorio queda **sin protección de secretos sin que nada lo avise**. MSYS lo tolera, que es peor — en Windows parece que funciona. Por eso los scripts POSIX llevan `eol=lf` explícito. Verificado que `git add --renormalize .` no cambia ni un archivo existente: los 145 de texto ya estaban en LF.
+4. **Efecto colateral que conviene registrar:** con el `.gitignore` puesto, la afirmación de `SECURITY.md:36` —"`.env` files are gitignored by default"— **pasa a ser cierta**. La mitad documental del hallazgo 1 queda resuelta. Lo que sigue mal en ese archivo es el destinatario del reporte de seguridad, que apunta al upstream: paso 8.
+
+---
+
 ## Secuencia de adopción
 
 - [x] 0. Diagnóstico — 2026-09-11
 - [x] 1. `/ingenieria:puntero` — 2026-09-11 · `AGENTS.md` + `CLAUDE.md` (`@AGENTS.md`)
-- [ ] 2. `/ingenieria:higiene`
+- [x] 2. `/ingenieria:higiene` — 2026-09-11 · `.gitignore`, `.gitattributes`, `.githooks/`, `scripts/revisar_secretos.py`
 - [ ] 3. `/ingenieria:reglas`
 - [ ] 4. `/ingenieria:estructura`
 - [ ] 5. `/ingenieria:readme-proyecto`

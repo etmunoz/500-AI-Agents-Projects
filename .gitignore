@@ -1,0 +1,42 @@
+# ─── Secretos ────────────────────────────────────────────────────────────────
+# Un .env real no se versiona nunca. `.env.example` es la plantilla y SÍ se
+# versiona: hay 24 en el repositorio y son parte de la documentación de cada
+# agente. La negación va después del patrón que lo captura, o no tiene efecto.
+.env
+.env.*
+!.env.example
+
+# ─── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# ─── Node — solo bajo web/, que es el único paquete npm del repositorio ──────
+/web/node_modules/
+/web/dist/
+/web/.vite/
+npm-debug.log*
+
+# ─── Salidas que dejan los agentes al ejecutarse ─────────────────────────────
+# Cada agente se corre desde su propia carpeta (`cd agents/<x> && python
+# agent.py`), así que los archivos que genera caen ahí. Se anclan a la ruta
+# exacta: un patrón suelto como `*.csv` o `*.md` escondería contenido real.
+/agents/04-sql-query-agent/demo.sqlite
+/agents/08-data-analysis-agent/sample_data.csv
+/agents/10-meeting-notes-agent/meeting_notes.md
+/agents/16-documentation-writer/README_*.md
+/agents/16-documentation-writer/documented_*.py
+
+# NO se ignora `test_*.py`, que es lo que genera el agente 15 en su carpeta.
+# Ignorarlo escondería las pruebas reales el día que el repositorio tenga
+# alguna — hoy no tiene ninguna. Si el agente 15 te deja un test_*.py suelto,
+# borralo a mano.
+
+# ─── Sistema operativo y editores ────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
