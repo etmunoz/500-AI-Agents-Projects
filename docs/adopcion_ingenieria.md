@@ -52,7 +52,24 @@ Ni un archivo de test entre los 145 versionados. Ningún workflow de CI ejecuta 
 
 **4. Es un fork y toda la documentación apunta al original.**
 
-Nueve referencias a `ashishpatel26/500-AI-Agents-Projects`: los cuatro badges del encabezado, el `git clone` del Quick Start (`README.md:40`), el gráfico de estrellas, el enlace de "Report Issue", el advisory de seguridad y los `assignees` de las dos plantillas de issue. Dos consecuencias concretas: quien siga el Quick Start al pie de la letra clona el repositorio de otra persona, y quien reporte una vulnerabilidad la manda al correo de otra persona.
+**13 referencias al original, en 6 archivos.** Inventario línea por línea, medido el 2026-09-11 con `grep -rnE 'ashishpatel26|ashishpatel\.ce\.2011' --include='*.md' --include='*.yml'`:
+
+| Archivo | Línea | Qué es |
+|---|---|---|
+| `README.md` | 5, 6, 7, 10 | Los cuatro badges del encabezado (stars, forks, contributors, last-commit) |
+| `README.md` | 40 | El `git clone` del Quick Start |
+| `README.md` | 300 | El enlace del gráfico de estrellas |
+| `README.md` | 316 | El pie: "Report Issue" y "Request Agent" |
+| `SECURITY.md` | 15 | Correo de contacto de seguridad |
+| `SECURITY.md` | 16 | URL del advisory privado |
+| `CODE_OF_CONDUCT.md` | 35 | Correo para denunciar conducta |
+| `.github/ISSUE_TEMPLATE/bug_report.md` | 6 | `assignees` |
+| `.github/ISSUE_TEMPLATE/feature_request.md` | 6 | `assignees` |
+| `.github/workflows/link-checker.yml` | 35 | Regla que **excluye** la URL del upstream del chequeo de enlaces |
+
+Dos consecuencias concretas: quien siga el Quick Start al pie de la letra clona el repositorio de otra persona, y quien reporte una vulnerabilidad —o una conducta— la manda al correo de otra persona.
+
+> **Corrección del 2026-09-11.** Este informe decía originalmente "nueve referencias en cuatro archivos". El conteo salió de un `grep` que sólo miraba `*.md` con el patrón `ashishpatel26`, y se le escaparon tres: el correo del mantenedor original en `SECURITY.md` y en `CODE_OF_CONDUCT.md` —que el patrón no cubría— y la regla de exclusión de `link-checker.yml`, que está en un `.yml`. La cifra corregida es 13 en 6 archivos, y cambia el alcance de los pasos 5 y 8.
 
 **5. El titular no coincide con el contenido.**
 
@@ -76,7 +93,7 @@ Es lo único que el repositorio despliega, y no aparece en el README, ni en la g
 
 - **El alcance acotado de `.markdownlint-cli2.jsonc`.** Desactiva diez reglas cosméticas y limita los globs, con el motivo escrito en comentarios dentro del propio archivo ("reformatting 400 lines to satisfy a linter buys nothing"). Es una convención distinta con motivo declarado: se respeta.
 - **Los agentes autocontenidos.** Sin `requirements.txt` en la raíz, sin monorepo, cada carpeta con sus dependencias. Es una decisión explícita de `agents/README.md` ("No monorepo setup needed") y sostiene el caso de uso del repositorio.
-- **Relación con el upstream: decidida — el fork diverge.** El PM lo resolvió el 2026-09-11. Las nueve referencias a `ashishpatel26/500-AI-Agents-Projects` (badges, `git clone` del Quick Start, enlace de issues, gráfico de estrellas, advisory de seguridad y los `assignees` de las dos plantillas de issue) **se reescriben a `etmunoz/`**. Eso no es trabajo del paso 1: el README va en el paso 5 y el contacto de seguridad en el paso 8. Queda anotado acá para que no se pierda entre medio.
+- **Relación con el upstream: decidida — el fork diverge.** El PM lo resolvió el 2026-09-11. Las **13 referencias** a `ashishpatel26` **se reescriben a `etmunoz/`** — el inventario línea por línea está en el hallazgo 4. Eso no es trabajo del paso 1: el `README.md` va en el paso 5, y `SECURITY.md`, `CODE_OF_CONDUCT.md`, las plantillas de issue y `link-checker.yml` en el paso 8. Queda anotado acá para que no se pierda entre medio.
 
 ---
 
@@ -167,13 +184,63 @@ La trampa del **bit de ejecución de los hooks**: `core.filemode=false` en Git p
 
 ---
 
+## Paso 4 — Estructura documental · 2026-09-11
+
+### Cero movimientos, y es un resultado válido
+
+**No se ejecutó ni un solo `git mv`.** `docs/` tiene exactamente dos archivos —`adopcion_ingenieria.md` y `reglas/reglas_desarrollo.md`— y los creó esta misma adopción, en los pasos 0 y 3, ya en la ruta estándar. No hay nada fuera de lugar porque no hay nada más.
+
+Tampoco había salidas generadas versionadas dentro de `docs/` (`find docs -type f ! -name '*.md'` → vacío), así que no hubo nada que sacar ni que agregar al `.gitignore`.
+
+**No se crearon las carpetas vacías.** Una carpeta vacía no informa: promete un contenido que no existe, y quien la abra va a asumir que el proceso se abandonó.
+
+### Las carpetas ausentes, declaradas
+
+| Carpeta | Estado | Motivo, o el costo de no tenerla |
+|---|---|---|
+| `docs/requerimientos/` | **No aplica** | Lo que este repositorio recibe son aportes de agentes, no requerimientos. El contrato de cada aporte es el `README.md` del agente más los cinco archivos obligatorios. Declarado en §10.4 de las reglas. |
+| `docs/planes/` y `planes/historicos/` | **No se usa todavía** | **El costo:** el trabajo que cabe en una sesión queda registrado en el mensaje de commit, y alcanza. El que abarque varias sesiones **se pierde**, porque el mensaje no se escribe hasta el final y la conversación no sobrevive. Se crea con el primer trabajo que no entre en una sesión. |
+| `docs/revisiones/` y `revisiones/historicos/` | **No se usa todavía** | **El costo:** hoy no hay dónde dejar el resultado real de una validación, así que la evidencia vive en el cuerpo del commit y no se puede releer por tema. Se crea junto con `planes/`: un walkthrough sin plan que lo origine no tiene de qué informar. |
+| `docs/manuales/` | **Pendiente** | 🚧 La crea el paso 6 (`/ingenieria:manuales`). |
+| `docs/referencias/` | **Pendiente** | 🚧 La crea el paso 7 (`/ingenieria:auditoria`), que es donde se calibran las herramientas que la llenan. |
+| `docs/reglas/` | ✅ Existe | Paso 3. |
+| `docs/roadmap.md` | ✅ Creada en este paso | Ver abajo. |
+
+`docs/adopcion_ingenieria.md` —este archivo— queda suelto en la raíz de `docs/` a propósito: es un documento **vivo** de estado, y la estructura estándar reserva ese lugar para ellos.
+
+### La hoja de ruta, que no existía
+
+Creada: [`docs/roadmap.md`](roadmap.md).
+
+Se sembró **sólo con intenciones que ya estaban escritas** y vivían donde nadie las iba a releer. No hay planes cerrados ni walkthroughs de donde extraer, y el código no tiene una sola marca de intención: `grep -rnE 'TODO|FIXME|FUTURE|XXX|HACK'` sobre todos los `.py`, `.js`, `.jsx` y `.mjs` devuelve **cero**. El resultado se escribe aunque dé cero.
+
+Lo que sí apareció, y de dónde salió:
+
+| Entrada | Horizonte | De dónde salió |
+|---|---|---|
+| Cerrar la secuencia de adopción | Próximo | Trabajo en curso |
+| Reescribir las 13 referencias al upstream | Próximo | Decisión del PM, 2026-09-11 |
+| Las cinco categorías de aporte que `CONTRIBUTION.md` promete y no existen | Después | `CONTRIBUTION.md:14-18` — plantillas, integraciones, arneses de evaluación, experimentos reproducibles, utilidades de visualización. **Ninguna tiene hoy dónde vivir.** |
+| Acercar el catálogo al número que promete el nombre | Después | El nombre del repositorio y el título del `README.md` contra las ~139 entradas reales |
+| Un arnés que verifique que los agentes siguen corriendo | Algún día | Medición del paso 3: 20 de 21 agentes dependen de un proveedor externo y de una versión fijada de framework |
+
+**Lo que deliberadamente NO entró a la hoja de ruta**, porque está roto y no es intención de futuro: las cero pruebas, las 1.057 líneas de `App.jsx`, los 17 agentes que no validan la salida del modelo, el verificador de enlaces que sólo mira `README.md`, y `web/` sin documentar. Todo eso vive como defecto medido en este mismo informe. Una hoja de ruta llena de defectos es un rastreador de errores con peores herramientas.
+
+### Referencias corregidas
+
+Ninguna por movimiento —no hubo movimientos—, pero **cuatro por un conteo mal medido**: ver la corrección del hallazgo 4. `AGENTS.md`, este informe (dos lugares) y las reglas (dos lugares) afirmaban "nueve referencias al upstream en cuatro archivos"; el número real es **13 en 6**. La trampa quedó registrada en §11.2 de las reglas, porque tiene mecanismo: todo inventario que vaya a un documento se escribe con el comando que lo produjo al lado, cubriendo todas las extensiones y todos los patrones del concepto.
+
+No se corrió `referencias_cruzadas.py`: escribe en `docs/referencias/` y su calibración es trabajo del paso 7. Los enlaces se verificaron uno por uno con `test -e`.
+
+---
+
 ## Secuencia de adopción
 
 - [x] 0. Diagnóstico — 2026-09-11
 - [x] 1. `/ingenieria:puntero` — 2026-09-11 · `AGENTS.md` + `CLAUDE.md` (`@AGENTS.md`)
 - [x] 2. `/ingenieria:higiene` — 2026-09-11 · `.gitignore`, `.gitattributes`, `.githooks/`, `scripts/revisar_secretos.py`
 - [x] 3. `/ingenieria:reglas` — 2026-09-11 · `docs/reglas/reglas_desarrollo.md`
-- [ ] 4. `/ingenieria:estructura`
+- [x] 4. `/ingenieria:estructura` — 2026-09-11 · cero movimientos; `docs/roadmap.md` creada; carpetas ausentes declaradas
 - [ ] 5. `/ingenieria:readme-proyecto`
 - [ ] 6. `/ingenieria:manuales`
 - [ ] 7. `/ingenieria:auditoria`

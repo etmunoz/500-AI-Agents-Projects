@@ -36,7 +36,7 @@ Sin esto, dos documentos que se contradicen se resuelven por quien lo leyó últ
 - **Idioma del código**: **inglés** para variables, comentarios, docstrings, nombres de carpeta y mensajes de commit. La documentación de proceso interno —este archivo, `docs/adopcion_ingenieria.md`, `AGENTS.md`— está en español. El catálogo y los README de agentes, en inglés: su audiencia es la comunidad.
 - **Entorno**: Python ≥3.9 con `pip` y `venv` (uno por agente); Node ≥18 con `npm` para `web/`.
 - **Interfaz**: CLI por agente (`python agent.py`) + una SPA estática de catálogo.
-- **Origen**: fork de `ashishpatel26/500-AI-Agents-Projects`. **Decisión del PM del 2026-09-11: este fork diverge.** No se agregan referencias nuevas al upstream; las nueve que quedan se reescriben en los pasos 5 y 8 de la adopción.
+- **Origen**: fork de `ashishpatel26/500-AI-Agents-Projects`. **Decisión del PM del 2026-09-11: este fork diverge.** No se agregan referencias nuevas al upstream; las **13 que quedan, repartidas en 6 archivos**, se reescriben en los pasos 5 y 8 de la adopción. Inventario línea por línea en [`docs/adopcion_ingenieria.md`](../adopcion_ingenieria.md).
 
 ### 1.1. Lo que este proyecto no es
 
@@ -258,6 +258,8 @@ El error caro no es equivocarse: es **afirmar más de lo que se midió**.
 - **Operaciones destructivas, con confirmación explícita de una persona.** Incluye **no saltarse los hooks**: si el `pre-commit` bloquea, se investiga la causa, no se usa `--no-verify`.
 - **Ningún commit ni push por iniciativa propia de un agente.** Cada operación que publique o fije un estado requiere instrucción explícita del PM **en ese momento**, aunque ya lo haya pedido antes en la sesión.
 
+  > **Excepción vigente, acotada:** el 2026-09-11 el PM autorizó de forma permanente documentar, commitear y pushear **cada paso de la secuencia de adopción del manual de ingeniería**, sin volver a preguntar entre paso y paso. La excepción **se agota al cerrar el paso 9** y no se extiende a ningún otro trabajo. Una autorización permanente que nadie escribió es indistinguible de una que nadie dio.
+
 ---
 
 ## 9. Seguridad
@@ -359,7 +361,8 @@ Cuando algo hace perder tiempo, **no basta con arreglarlo**. Antes de cerrar el 
 | **Hooks sin bit de ejecución** | En Windows funciona perfecto. En Linux y macOS git **omite el hook en silencio** y el repositorio queda sin protección de secretos | `core.filemode=false` en Git para Windows: el `chmod +x` no se registra en el índice. Se commiteó `100644` | Los modos se fijaron a `100755` con `git update-index --chmod=+x` y se verificaron **en un clon limpio**, no leyendo el índice local |
 | **CRLF en scripts POSIX** | `bad interpreter` en Linux y macOS; en Windows no pasa nada | `core.autocrlf=true` a nivel **sistema** en Git para Windows. Sin `.gitattributes`, cada clon decide solo. MSYS tolera el `\r`, que es peor: en Windows parece que funciona | [`.gitattributes`](../../.gitattributes) con `eol=lf` explícito en `.githooks/*` y `*.sh` |
 | **`command -v python` encuentra un Python que no existe** | La comprobación de secretos informaba "no corrió" en vez de fallar, o peor, un chequeo salía verde sin haber corrido | En Windows, `python` y `python3` están en el PATH como **alias de la Microsoft Store** que fallan al ejecutarse. `command -v` los encuentra y los da por buenos | El intérprete se **prueba** con `-c ""`, no se pregunta si está. Y toda comprobación que no puede correr sale con **2 = NO SÉ**, nunca con 0 |
-| **El README manda a clonar otro repositorio** | Quien sigue el Quick Start al pie de la letra termina en el fork de otra persona; quien reporta una vulnerabilidad la manda al correo de otra persona | Fork de `ashishpatel26` con las nueve referencias al original intactas: badges, `git clone`, issues, advisory de seguridad y `assignees` | 🚧 Todavía ninguno. Se reescriben en los pasos 5 y 8 de la adopción. Hasta entonces, la regla de §1: no agregar referencias nuevas al upstream |
+| **El README manda a clonar otro repositorio** | Quien sigue el Quick Start al pie de la letra termina en el fork de otra persona; quien reporta una vulnerabilidad —o una conducta— la manda al correo de otra persona | Fork de `ashishpatel26` con **13 referencias al original intactas en 6 archivos** | 🚧 Todavía ninguno. Se reescriben en los pasos 5 y 8. Hasta entonces, la regla de §1 |
+| **Contar con un `grep` demasiado estrecho** | El informe del paso 0 afirmó "nueve referencias al upstream en cuatro archivos". El número real es **13 en 6** | El `grep` sólo miraba `*.md` y sólo el patrón `ashishpatel26`. Se le escaparon el correo del mantenedor original (`ashishpatel.ce.2011@`) en dos archivos, y una regla en un `.yml`. **Una cifra medida con el filtro equivocado se ve exactamente igual que una bien medida** | Todo inventario que vaya a un documento se escribe con el comando que lo produjo al lado, y el comando cubre **todas** las extensiones y **todos** los patrones del concepto, no el más obvio. Ver §7 |
 
 ---
 
