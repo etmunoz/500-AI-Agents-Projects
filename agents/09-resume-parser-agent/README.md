@@ -8,7 +8,8 @@ Parses resumes (TXT or PDF) into structured JSON and optionally scores candidate
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -16,13 +17,13 @@ cp .env.example .env
 
 ```bash
 # Parse only (uses built-in sample resume)
-python agent.py
+uv run python agent.py
 
 # Parse your resume
-python agent.py --resume path/to/resume.pdf
+uv run python agent.py --resume path/to/resume.pdf
 
 # Parse + fit score
-python agent.py --resume resume.pdf --job-desc "Senior Python Engineer with K8s experience..."
+uv run python agent.py --resume resume.pdf --job-desc "Senior Python Engineer with K8s experience..."
 ```
 
 ## Output includes

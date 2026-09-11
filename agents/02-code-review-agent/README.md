@@ -8,7 +8,8 @@ An AI agent that reviews code for bugs, security issues, performance problems, a
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -16,13 +17,13 @@ cp .env.example .env
 
 ```bash
 # Review a file
-python agent.py --file path/to/your/code.py
+uv run python agent.py --file path/to/your/code.py
 
 # Review inline code
-python agent.py --code "def divide(a, b): return a / b"
+uv run python agent.py --code "def divide(a, b): return a / b"
 
 # Review non-Python code
-python agent.py --file app.js --language javascript
+uv run python agent.py --file app.js --language javascript
 ```
 
 ## Sample Output

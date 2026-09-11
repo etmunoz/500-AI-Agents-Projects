@@ -8,16 +8,17 @@ Two AI agents debate any topic from opposing sides, with an impartial AI judge d
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
 ## Run
 
 ```bash
-python agent.py --topic "AI will eliminate more jobs than it creates"
-python agent.py --topic "Remote work is better than office work" --rounds 3
-python agent.py --topic "Cryptocurrency will replace fiat currency" --rounds 2
+uv run python agent.py --topic "AI will eliminate more jobs than it creates"
+uv run python agent.py --topic "Remote work is better than office work" --rounds 3
+uv run python agent.py --topic "Cryptocurrency will replace fiat currency" --rounds 2
 ```
 
 ## Architecture

@@ -8,7 +8,8 @@ Generates comprehensive documentation for Python modules: README, API reference,
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -16,11 +17,11 @@ cp .env.example .env
 
 ```bash
 # Generate README + docstrings
-python agent.py --file my_module.py
+uv run python agent.py --file my_module.py
 
 # README only
-python agent.py --file utils.py --format readme
+uv run python agent.py --file utils.py --format readme
 
 # Docstrings only  
-python agent.py --file api.py --format docstrings
+uv run python agent.py --file api.py --format docstrings
 ```

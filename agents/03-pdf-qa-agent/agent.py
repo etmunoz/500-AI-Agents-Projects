@@ -17,6 +17,13 @@ from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
 from llama_index.core.memory import ChatMemoryBuffer
 from llama_index.llms.openai import OpenAI
 
+import sys
+
+# Windows consoles default to cp1252, which cannot encode the emoji this
+# script prints -- it would die on the first print. Harmless elsewhere.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 load_dotenv()
 
 

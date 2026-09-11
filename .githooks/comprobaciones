@@ -1,0 +1,36 @@
+# Comprobaciones que corre el hook pre-push, una por linea:
+#
+#     <etiqueta>|<comando>
+#
+# El comando se ejecuta desde la raiz del repositorio. Una etiqueta que empieza
+# con ! marca la comprobacion como RAPIDA: es la unica que sigue corriendo con
+# HOOK_RAPIDO=1.
+#
+# REGLA QUE NO SE NEGOCIA: una comprobacion que NO PUEDE correr sale con 2
+# ("NO SE"), nunca con 0. Un chequeo que no corrio y sale 0 se lee como que
+# paso, y eso es un falso verde construido a mano.
+#
+# Estado de este repositorio al 2026-09-11: no tiene ni una sola prueba (0
+# archivos de test entre 145 versionados) y el CI nunca ejecuta Python. Las
+# comprobaciones de abajo son las unicas verificables hoy. Cuando el proyecto
+# tenga suite, se agrega aca.
+
+# --- markdown: lo mismo que corre .github/workflows/markdown-lint.yml --------
+!markdown|command -v npx >/dev/null 2>&1 || exit 2; npx --yes markdownlint-cli2 >/dev/null 2>&1
+
+# --- sintaxis de los 25 agentes ---------------------------------------------
+# Responde NO SE (codigo 2) si no hay interprete declarado. Para habilitarla:
+#
+#     uv python install
+#     uv python list                                    # copiar la ruta
+#     git config --local ingenieria.python "<esa ruta>"
+#
+# Declarar la RUTA no es opcional ni una comodidad: en Windows los alias de la
+# Microsoft Store estan antes en el PATH y FALLAN al ejecutarse, asi que
+# instalar Python no alcanza --- `python3` sigue roto. Por eso el interprete se
+# PRUEBA con `-c ""` en vez de preguntarle a `command -v`, que los da por buenos.
+agentes (sintaxis)|PY=$(git config --get ingenieria.python 2>/dev/null); for c in "$PY" python3 python py; do [ -n "$c" ] && "$c" -c "" 2>/dev/null && { "$c" -m compileall -q agents crewai_mcp_course; exit $?; }; done; exit 2
+
+# --- build de la SPA que se despliega a GitHub Pages -------------------------
+# Responde NO SE hasta que se corra `npm install` dentro de web/.
+web (build)|[ -d web/node_modules ] || exit 2; npm --prefix web run build --silent >/dev/null 2>&1

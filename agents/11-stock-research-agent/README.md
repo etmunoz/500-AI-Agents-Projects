@@ -9,16 +9,17 @@ Fetches real-time stock data via Yahoo Finance and generates an AI-powered inves
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
 ## Run
 
 ```bash
-python agent.py --ticker AAPL
-python agent.py --ticker NVDA
-python agent.py --ticker TSLA
+uv run python agent.py --ticker AAPL
+uv run python agent.py --ticker NVDA
+uv run python agent.py --ticker TSLA
 ```
 
 ## Output

@@ -8,14 +8,15 @@ Suggests 3 recipes from your available ingredients with full instructions, nutri
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
 ## Run
 
 ```bash
-python agent.py --ingredients "chicken, garlic, lemon, rosemary"
-python agent.py --ingredients "tofu, broccoli, ginger, soy sauce" --diet vegan --time 20
-python agent.py --ingredients "pasta, tomatoes, basil, parmesan" --servings 4
+uv run python agent.py --ingredients "chicken, garlic, lemon, rosemary"
+uv run python agent.py --ingredients "tofu, broccoli, ginger, soy sauce" --diet vegan --time 20
+uv run python agent.py --ingredients "pasta, tomatoes, basil, parmesan" --servings 4
 ```

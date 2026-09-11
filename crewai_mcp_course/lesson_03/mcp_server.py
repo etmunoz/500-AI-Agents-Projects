@@ -11,6 +11,13 @@ Run: python mcp_server.py
 import json
 from datetime import datetime
 
+import sys
+
+# Windows consoles default to cp1252, which cannot encode the emoji this
+# script prints -- it would die on the first print. Harmless elsewhere.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 try:
     from fastmcp import FastMCP
     HAS_FASTMCP = True

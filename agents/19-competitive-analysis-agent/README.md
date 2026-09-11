@@ -8,16 +8,17 @@ LangGraph multi-step agent that identifies competitors, analyzes each one, and g
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
 ## Run
 
 ```bash
-python agent.py --company "Notion" --industry "productivity software"
-python agent.py --company "Stripe" --industry "payment processing"
-python agent.py --company "Figma" --industry "design tools"
+uv run python agent.py --company "Notion" --industry "productivity software"
+uv run python agent.py --company "Stripe" --industry "payment processing"
+uv run python agent.py --company "Figma" --industry "design tools"
 ```
 
 ## Output

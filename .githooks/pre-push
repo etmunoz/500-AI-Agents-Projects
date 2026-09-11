@@ -1,0 +1,149 @@
+#!/bin/sh
+# ============================================================================
+# Archivo: herramientas/hooks/pre-push
+# Objetivo: Correr las comprobaciones del proyecto ANTES de que el codigo salga
+#           del equipo. Es la red de seguridad local; NO reemplaza a CI (esto
+#           corre en TU maquina, no en una limpia, y en una sola version del
+#           runtime).
+# Proyecto: herramienta generica del manual de ingenieria (etmunoz/ingenieria)
+# Entorno: POSIX sh — corre igual en Linux, macOS y Windows (Git Bash).
+#
+# INSTALACION, UNA VEZ POR CLON
+# -----------------------------
+# Git no activa hooks versionados solo, a proposito: ejecutarian codigo de
+# cualquiera que te mande un repositorio.
+#
+#     git config core.hooksPath <carpeta-donde-copiaste-los-hooks>
+#
+# QUE CORRE, Y COMO SE DECLARA
+# ----------------------------
+# Este hook no sabe nada del proyecto. Lee las comprobaciones de un archivo
+# `comprobaciones` ubicado junto al hook (o el que indique COMPROBACIONES_PRE_PUSH).
+# Una comprobacion por linea, con el formato:
+#
+#     <etiqueta>|<comando>
+#
+# Lineas vacias y las que empiezan con # se ignoran. Ejemplo:
+#
+#     # comprobaciones
+#     tipos|npx tsc --noEmit
+#     linter|uv run ruff check .
+#     pruebas|uv run pytest -q
+#
+# Si el archivo no existe, el hook intenta una deteccion minima por convencion
+# (suite de Python y/o de Node) y avisa de que lo hizo. **Detectar por
+# convencion es un ultimo recurso, no el modo normal**: lo que corre antes de
+# publicar tiene que estar declarado, no adivinado.
+#
+# CORRER TODAS Y REPORTAR AL FINAL
+# --------------------------------
+# El hook NO se detiene en la primera falla: corre todo y reporta el conjunto.
+# Frenar en la primera obliga a N ciclos de push para descubrir N problemas, y
+# eso es exactamente lo que hace que alguien empiece a usar --no-verify.
+#
+# SALTEAR
+# -------
+#   HOOK_RAPIDO=1 git push     # sólo las comprobaciones marcadas como rapidas
+#   git push --no-verify       # todo, en una emergencia
+#
+# Una comprobacion es "rapida" si su etiqueta empieza con `!`.
+# ============================================================================
+
+VERDE='\033[0;32m'
+ROJO='\033[0;31m'
+AMARILLO='\033[0;33m'
+FIN='\033[0m'
+
+FALLOS=0
+OMITIDAS=0
+NO_SE=0
+
+paso()   { printf "  ${VERDE}ok${FIN}    %s\n" "$1"; }
+falla()  { printf "  ${ROJO}FALLA${FIN} %s\n" "$1"; FALLOS=$((FALLOS + 1)); }
+salta()  { printf "  ${AMARILLO}--${FIN}    %s (omitida: HOOK_RAPIDO=1)\n" "$1"; OMITIDAS=$((OMITIDAS + 1)); }
+nose()   { printf "  ${AMARILLO}NO SÉ${FIN} %s\n" "$1"; NO_SE=$((NO_SE + 1)); }
+
+RAIZ=$(git rev-parse --show-toplevel 2>/dev/null) || RAIZ=$(pwd)
+DIR_HOOK=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+ARCHIVO="${COMPROBACIONES_PRE_PUSH:-$DIR_HOOK/comprobaciones}"
+
+printf "\n[pre-push] Comprobaciones antes de publicar\n"
+
+ejecutar() { # $1=etiqueta  $2=comando  $3=rapida(1/0)
+    etiqueta="$1"; comando="$2"; rapida="$3"
+    if [ "${HOOK_RAPIDO:-}" = "1" ] && [ "$rapida" != "1" ]; then
+        salta "$etiqueta"; return
+    fi
+    salida=$( (cd "$RAIZ" && eval "$comando") 2>&1 )
+    codigo=$?
+    case "$codigo" in
+        0) paso "$etiqueta" ;;
+        # 2 = "no sé": la comprobación no pudo correr. NO es verde y NO frena.
+        # Existe porque un chequeo que no puede correr y sale con 0 se lee como
+        # que pasó — y eso es un falso verde construido a mano. Pasó acá mismo:
+        # una comprobación que no encontraba intérprete avisaba por pantalla,
+        # salía con 0, y el hook la listaba como `ok`.
+        2) nose "$etiqueta"
+           printf '%s\n' "$salida" | tail -6 | sed 's/^/        /' ;;
+        *) falla "$etiqueta"
+           printf '%s\n' "$salida" | tail -15 | sed 's/^/        /' ;;
+    esac
+}
+
+if [ -f "$ARCHIVO" ]; then
+    # Se lee por descriptor 3 para no consumir el stdin que git le pasa al hook
+    # (las referencias que se estan por publicar). Leerlo con `read` a secas se
+    # come esa entrada y deja al hook ciego si mas adelante hace falta.
+    exec 3< "$ARCHIVO"
+    while IFS= read -r linea <&3 || [ -n "$linea" ]; do
+        case "$linea" in ''|'#'*) continue ;; esac
+        etiqueta=${linea%%|*}
+        comando=${linea#*|}
+        [ "$etiqueta" = "$comando" ] && continue   # linea sin separador: se ignora
+        rapida=0
+        case "$etiqueta" in '!'*) rapida=1; etiqueta=${etiqueta#!} ;; esac
+        ejecutar "$etiqueta" "$comando" "$rapida"
+    done
+    exec 3<&-
+else
+    printf "${AMARILLO}  aviso: no hay archivo de comprobaciones (%s).${FIN}\n" "$ARCHIVO"
+    printf "         Se detecta por convencion, que es un ultimo recurso:\n"
+    printf "         lo que corre antes de publicar deberia estar declarado.\n"
+    detectada=0
+    if [ -f "$RAIZ/pyproject.toml" ] || [ -f "$RAIZ/pytest.ini" ]; then
+        if command -v uv >/dev/null 2>&1; then
+            ejecutar "pruebas (python)" "uv run pytest -q" 0; detectada=1
+        elif command -v pytest >/dev/null 2>&1; then
+            ejecutar "pruebas (python)" "pytest -q" 0; detectada=1
+        fi
+    fi
+    if [ -f "$RAIZ/package.json" ] && command -v npm >/dev/null 2>&1; then
+        if grep -q '"test"' "$RAIZ/package.json" 2>/dev/null; then
+            ejecutar "pruebas (node)" "npm test --silent" 0; detectada=1
+        fi
+    fi
+    if [ "$detectada" -eq 0 ]; then
+        printf "${AMARILLO}  No se detecto ninguna suite: NO se comprobo nada.${FIN}\n"
+        printf "         Esto es un \"no se\", no un verde.\n\n"
+        exit 0
+    fi
+fi
+
+printf "\n"
+if [ "$FALLOS" -gt 0 ]; then
+    printf "${ROJO}[pre-push] %s comprobacion(es) fallaron. El push se detuvo.${FIN}\n" "$FALLOS"
+    printf "           Para publicar igual en una emergencia: git push --no-verify\n"
+    printf "           (y entonces el arreglo va en el commit siguiente, no \"despues\").\n\n"
+    exit 1
+fi
+
+if [ "$NO_SE" -gt 0 ]; then
+    printf "${AMARILLO}[pre-push] Sin fallos, pero %s comprobacion(es) NO pudieron correr.${FIN}\n" "$NO_SE"
+    printf "           Eso no es verde: es lo que no se comprobo.\n\n"
+elif [ "$OMITIDAS" -gt 0 ]; then
+    printf "${AMARILLO}[pre-push] Todo en verde, con %s comprobacion(es) omitidas por HOOK_RAPIDO.${FIN}\n\n" "$OMITIDAS"
+else
+    printf "${VERDE}[pre-push] Todo en verde.${FIN}\n\n"
+fi
+exit 0

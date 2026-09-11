@@ -22,6 +22,13 @@ from langchain.agents import create_sql_agent
 from langchain.agents.agent_toolkits import SQLDatabaseToolkit
 from langchain.agents.agent_types import AgentType
 
+import sys
+
+# Windows consoles default to cp1252, which cannot encode the emoji this
+# script prints -- it would die on the first print. Harmless elsewhere.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 load_dotenv()
 
 

@@ -8,7 +8,8 @@ Connects to any SQLite database and answers natural language questions by genera
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -16,13 +17,13 @@ cp .env.example .env
 
 ```bash
 # Demo mode — creates a sample e-commerce database automatically
-python agent.py
+uv run python agent.py
 
 # Your own database
-python agent.py --db path/to/your/database.sqlite
+uv run python agent.py --db path/to/your/database.sqlite
 
 # Single question
-python agent.py --question "What is the total revenue by country?"
+uv run python agent.py --question "What is the total revenue by country?"
 ```
 
 Databases open in read-only mode by default. Use `--allow-write` only with a disposable database

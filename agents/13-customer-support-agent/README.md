@@ -8,17 +8,18 @@ LangGraph-powered support agent with RAG knowledge base and automatic escalation
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
 ## Run
 
 ```bash
-python agent.py
+uv run python agent.py
 
 # Use your own .txt/.md knowledge base files
-python agent.py --kb-dir docs/
+uv run python agent.py --kb-dir docs/
 ```
 
 ## Features

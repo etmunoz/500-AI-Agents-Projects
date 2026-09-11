@@ -24,6 +24,13 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from pydantic import Field
 
+import sys
+
+# Windows consoles default to cp1252, which cannot encode the emoji this
+# script prints -- it would die on the first print. Harmless elsewhere.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 load_dotenv()
 
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)

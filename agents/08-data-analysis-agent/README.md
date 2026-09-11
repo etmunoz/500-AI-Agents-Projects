@@ -8,7 +8,8 @@ Chat with your data. Load any CSV or Excel file and ask analytical questions in 
 ## Setup
 
 ```bash
-pip install -r requirements.txt
+uv venv
+uv pip install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -16,13 +17,13 @@ cp .env.example .env
 
 ```bash
 # Demo mode — creates sample sales data automatically
-python agent.py --allow-dangerous-code
+uv run python agent.py --allow-dangerous-code
 
 # Your own data
-python agent.py --file your_data.csv --allow-dangerous-code
+uv run python agent.py --file your_data.csv --allow-dangerous-code
 
 # Single question
-python agent.py --file sales.csv --question "What is the monthly revenue trend?" --allow-dangerous-code
+uv run python agent.py --file sales.csv --question "What is the monthly revenue trend?" --allow-dangerous-code
 ```
 
 ## Safety Note
