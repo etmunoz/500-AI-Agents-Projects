@@ -12,13 +12,12 @@
 |---|---|---|
 | `README.md` | alta | README.md tiene un link roto: `.github/workflows/star-history.yml` |
 
-## funcion_muerta (10) — destino sugerido: **revisar**
+## funcion_muerta (9) — destino sugerido: **revisar**
 
 > 1) Hay una superficie que deberia usarla? 2) Algun manual o test la menciona como si funcionara? 3) Existe su espejo CLI/interfaz? Recien si las tres dan que no: por que se escribio y que la dejo sin uso.
 
 | Objeto | Confianza | Detalle |
 |---|---|---|
-| `agents/13-customer-support-agent/agent.py::route_after_escalation_check` | posible | Funcion definida y nunca llamada: route_after_escalation_check |
 | `crewai_mcp_course/lesson_02/agent.py::TextFormatterTool._run` | posible | Funcion definida y nunca llamada: TextFormatterTool._run |
 | `crewai_mcp_course/lesson_02/agent.py::WordCountTool._run` | posible | Funcion definida y nunca llamada: WordCountTool._run |
 | `crewai_mcp_course/lesson_03/agent.py::DateTimeTool._run` | posible | Funcion definida y nunca llamada: DateTimeTool._run |

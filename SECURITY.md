@@ -14,11 +14,12 @@ If you discover a security vulnerability in this repository or any of the agent 
 
 **Use [GitHub's private security advisory](https://github.com/etmunoz/500-AI-Agents-Projects/security/advisories/new).** It reaches the maintainers privately, keeps the report out of public view until a fix exists, and gives you a thread to follow.
 
-<!-- The upstream repository listed a maintainer email here. It was removed on
-     2026-09-11 rather than swapped: this fork diverged, and that address
-     belonged to someone no longer involved -- reports were being directed to an
-     uninvolved third party. If this project wants a direct address as well as
-     the advisory channel, add it here. -->
+This is the only channel. The project deliberately publishes no contact email.
+
+<!-- Maintainer decision, 2026-09-14: no contact email. The upstream maintainer's
+     address was removed on 2026-09-11 because it sent vulnerability reports to
+     someone uninvolved in this fork. Do not add an address back without that
+     decision being revisited. -->
 
 ### What to include
 

@@ -80,7 +80,7 @@
 
 - **importa:** —
 - **importado por:** —
-- **funciones (7):** `retrieve_context`, `check_escalation`, `generate_response`, `route_after_escalation_check`, `build_graph`, `load_kb_texts`, `main`
+- **funciones (6):** `retrieve_context`, `check_escalation`, `generate_response`, `build_graph`, `load_kb_texts`, `main`
 
 ## `agents/14-social-media-agent/agent.py`
 

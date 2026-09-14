@@ -9,17 +9,17 @@
 |---|---|
 | constante | 33 |
 | documento | 40 |
-| funcion | 94 |
+| funcion | 93 |
 | modulo | 27 |
 | recurso | 1 |
 
-**Aristas (relaciones):** 1248
+**Aristas (relaciones):** 1251
 
 ## Resumen de hallazgos
 
 | Tipo | Cantidad |
 |---|---|
-| funcion_muerta | 10 |
+| funcion_muerta | 9 |
 | ref_rota | 1 |
 
 ## Documentos

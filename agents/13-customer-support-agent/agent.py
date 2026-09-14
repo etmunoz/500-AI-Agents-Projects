@@ -12,7 +12,7 @@ Usage:
 import argparse
 import os
 from pathlib import Path
-from typing import Annotated, Literal, TypedDict
+from typing import Annotated, TypedDict
 
 from dotenv import load_dotenv
 from langchain_community.vectorstores import FAISS
@@ -93,10 +93,6 @@ Be friendly, concise, and solution-focused. If unsure, say so honestly."""),
         response_text = response.content
 
     return {"response": response_text, "messages": [AIMessage(content=response_text)]}
-
-
-def route_after_escalation_check(state: SupportState) -> Literal["generate", "generate"]:
-    return "generate"
 
 
 def build_graph():
